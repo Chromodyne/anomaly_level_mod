@@ -19,7 +19,7 @@ TODO
 
 -- FILE LINKS --
 --Keep these commented until used. Will crash otherwise.
-local config_file = ini_file("plugins\\level_system.ltx") -- Links the configuration (ltx) file to this script.
+local config_file = ini_file("levelmod\\level_system.ltx") -- Links the configuration (ltx) file to this script.
 exp_req = {}
 
 -- CONFIGURATION VARIABLES --
