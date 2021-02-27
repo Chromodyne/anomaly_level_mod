@@ -1,0 +1,183 @@
+--[[
+Zone Progression Mod
+
+Created By: Chromodyne
+Version: 0.02a (Alpha Build - Not for distribution.)
+Created: 02/25/21
+Updated: 02/27/21
+
+Notes: Currently this addon only creates a rudimentary level and experience system for the player. Right now it only gives 'general' exp but I want to eventually make it able to have different skills to level up. 
+I also eventually hope to make it able to account for NPCs gaining experience as well but time will tell if that's feasible. 
+
+TODO
+1. Figure out this damn config file bullshit.
+2. Make sure everything remains after saving.
+3. Vary experience by faction
+
+]]--
+
+
+-- FILE LINKS --
+--Keep these commented until used. Will crash otherwise.
+local config_file = ini_file("plugins\\level_system.ltx") -- Links the configuration (ltx) file to this script.
+exp_req = {}
+
+-- CONFIGURATION VARIABLES --
+local currentExp = 0;                       -- The player's current quantity of experience.
+local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
+local maxLevel = 20;                        -- Determines the max general level for the player.
+local breakPoints = {1000, 2000, 3000};     -- Determines how much experience is required to level up.
+
+-- INITIALIZATION --
+-- The on_game_start function initializes the callbacks required to hook into the game.
+-- The second parameter for each function can be changed to whatever you want the function name to be for better code readability. Remember to rename the functions as well!
+function on_game_start()
+
+    RegisterScriptCallback("on_key_press", on_key_press)                            -- Connected to whenever 
+    RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)          -- Connected to whenever NPCs die.
+    RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)   -- Connected to whenever monsters/mutants die.
+    RegisterScriptCallback("actor_on_update", actor_on_update) -- Connected to whenever the player updates. Good for looping.
+    ParseConfig()
+
+end
+
+
+-- GRANT EXPERIENCE ON KEY PRESS (DEBUG) --
+--Player gains experience just from pressing the 'C' key. For debugging purposes only.
+function on_key_press(key)
+
+    if (key == DIK_keys["DIK_C"] ) then
+        currentExp = currentExp + 500
+        printf(currentExp)
+    end
+
+end
+
+-- EXPERIENCE GAIN ON NPC DEATH --
+--Give player exp when they kill an npc.
+--TODO : Make it where the # of exp depends on faction, "level", etc.
+function npc_on_death_callback(victim, killer)
+
+    CheckKiller()
+
+end
+
+-- EXPERIENCE GAIN ON MONSTER DEATH --
+--TODO: Vary exp based on monster/mutant that was killed. e.g. Chimera exp >> Blind Dog
+function monster_on_death_callback(victim, killer)
+
+    CheckKiller()
+
+end
+
+-- GAME UPDATE LOOP --
+-- Runs various functions constantly to see if the player has gained experience, levelled up, etc.
+function actor_on_update()
+
+    LevelUp()
+
+end
+
+-- LEVEL UP FUNCTION --
+-- Determines if the player has gained enough experience to level up. If so, begin level up process.
+function LevelUp()
+
+        if (currentExp == exp_req[2]  and currentLevel < maxLevel) then
+            currentLevel = currentLevel + 1
+            currentExp = 0 -- Didn't want to have to make each new level go back to zero exp but for some reason it loops if I do not.
+            LevelUpProgression(currentLevel);
+        else end
+
+end
+
+-- GRANT BONUSES ON LEVEL UP --
+function LevelUpProgression(level)
+
+    printf("Beginning player level up sequence.")
+
+    GainStats()
+    GainImmunities()
+
+    printf("Level up sequence completed successfully.")
+    
+    return
+
+end
+
+-- INCREASE STATS (NO IMMUNITIES) --
+function GainStats()
+
+    --CURRENT STAT VARIABLES--
+    local currentMaxWeight = db.actor:get_actor_max_weight()         -- Get player's max carry weight.
+    local current_run_coef = db.actor:get_actor_run_coef()           -- Get player's run speed factor.
+    local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
+    --local current_jump_speed = db.actor:get_actor_jump_speed()
+    --TODO: Currently these are baked for every level. Later there will be an array for each level
+    --STAT CHANGE VARIABLES--
+    local increase_weight = 1                                   -- #kg weight max weight increases.
+    local increaseHealth = 2                                    -- #hp health will increase.
+    local run_speed_increase = 10                               -- Factor that run speed will increase by. (TODO)
+    local sprint_speed_increase = 12                            -- Factor that sprint speed will increase by.
+    --local currentMaxHealth = db.actor:max_health()
+
+    db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
+    db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
+    db.actor:set_actor_run_coef(current_run_coef + run_speed_increase)
+    db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
+    --TODO For the above, might want to use the 'boost' classes
+    --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
+    --db.actor:set_actor_jump_speed(current_jump_speed + 1000)
+
+end
+
+-- INCREASE PLAYER IMMUNITIES --
+function GainImmunities()
+
+    --TODO: Currently these are baked for every level. Use the LTX file for configuring this.
+    local gain_chemical_burn_protection = 1
+    local gain_chemical_burn_immunity = 1
+    local gain_explosion_immunity = 1
+    local gain_fire_wound_immunity = 1
+    local gain_radiation_protection = 1
+    local gain_radiation_immunity = 1
+    local gain_shock_immunity = 1
+    local gain_wound_immunity = 1
+    local gain_psy_protection = 1
+    local gain_psy_immunity = 1
+
+    --local casting = db.actor:cast_Ator():conditions()
+
+    db.actor:cast_Actor():conditions():BoostExplImmunity(50)
+    db.actor:cast_Actor():conditions():BoostBurnImmunity(gain_burn_immunity)
+    db.actor:cast_Actor():conditions():BoostRadiationProtection(gain_radiation_protection)
+    db.actor:cast_Actor():conditions():BoostRadiationImmunity(10)
+
+end
+
+-- CHECK IF PLAYER WAS KILLER -- 
+function CheckKiller()
+
+    local id = killer:id()
+
+    if (id == AC_ID) then -- Determines if the killer was the player or not. If not, experience is not gained.
+        GrantExperience()
+    end
+
+end
+
+-- GRANT PLAYER EXPERIENCE --
+function GrantExperience()
+
+    currentExp = currentExp + 500
+    printf(currentExp)
+
+end
+
+-- PARSE CONFIGURATION FILE --
+-- Adds data from level_system.ltx to an array that is used to determine level up bonuses.
+function ParseConfig()
+
+    exp_req[1] = config_file:r_float("1","exp_req")
+    exp_req[2] = config_file:r_float("2","exp_req")
+
+end
