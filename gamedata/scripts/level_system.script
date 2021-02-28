@@ -22,15 +22,10 @@ TODO
 local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
 --local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
 local level_thresholds = {}
---immunities_gained = {}
-
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
 local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
-
--- SERIALIZATION/SAVE DATA--
---local m_data = {} -- m_data is where the save_state callbacks look for data to encode.
 
 -- INITIALIZATION --
 function on_game_start()
@@ -43,9 +38,10 @@ function on_game_start()
     RegisterScriptCallback("load_state", load_state) -- Callback for reloading data from disk via alife_storage manager.
     ParseConfig()
 
+
 end
 
--- SAVING  DATA -- 
+-- SAVE LEVEL DATA -- 
 function save_state(m_data)
 
     if (USE_MARSHAL) then
@@ -62,7 +58,7 @@ function save_state(m_data)
 
 end
 
--- LOADING DATA --
+-- LOAD LEVEL DATA --
 function load_state(m_data)
 
     local save_data = m_data.save_data
@@ -73,7 +69,6 @@ function load_state(m_data)
     end
 
 end
-
 
 -- GRANT EXPERIENCE ON 'C' KEY PRESS (DEBUG ONLY) --
 function on_key_press(key)
@@ -220,3 +215,4 @@ function LevelUpMessage()
     actor_menu.set_fade_msg("Leveled up to Level " .. currentLevel, 5, nil, "device\\pda\\spot_discovered")
 
 end
+
