@@ -22,17 +22,19 @@
 ; 4. Immunity is a chance to completely negate that damage type while resist reduces damage or effects.
 ; 5. Read comments next to the level 1 stats for a description of what each one does.
 ; 6. Increasing run/sprint speed by too much can cause a variety of issues with actor locomotion.
-; 7. I know of the typos and weird naming conventions. I am doing this for consistency with the Anomaly codebase naming.
+; 7. You cannot skip levels. Due to a code limitation, experience resets to 0 at level up.
+; 8. I know of the typos and weird naming conventions. I am doing this for consistency with the Anomaly codebase naming.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; This section is for basic changes. You can increase max leve cap, etc.
 [config_parameters]
-max_level                   = 10 ; Sets max level that can be attained.
+max_level                   = 10 ; Sets max level that can be attained. (Default: 10)
 current_level               = 1  ; Determines player's current level. UNUSED
+restore_health              = 0  ; If set to 1 (true) the player gains full health when leveling up. (Default: 0)
 
 ; LEVEL 1 - WARNING: DO NOT CHANGE THE VALUES FOR LEVEL 1. RISK OF INSTABILITY.
 [1]
-exp_req                     = 0
+exp_req                     = 0 ; Required experience to reach this level.
 max_weight                  = 0 ; Increase max carry weight by this amount.
 run_speed                   = 0 ; Increase max run speeed by this amount (%).
 sprint_speed                = 0 ; Increase max sprint speed by this amount (%)
@@ -56,7 +58,7 @@ wound_immunity              = 0 ; Increase chance to negate bleeding by this amo
 ;LEVEL 2
 [2]
 exp_req                     = 1000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0
@@ -76,9 +78,10 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
+;LEVEL 3
 [3]
 exp_req                     = 2000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0
@@ -100,7 +103,7 @@ wound_immunity              = 0
 
 [4]
 exp_req                     = 3000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0
@@ -122,7 +125,7 @@ wound_immunity              = 0
 
 [5]
 exp_req                     = 4000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0
@@ -144,7 +147,7 @@ wound_immunity              = 0
 
 [6]
 exp_req                     = 5000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0
@@ -166,7 +169,7 @@ wound_immunity              = 0
 
 [7]
 exp_req                     = 6000
-max_weight                  = 0
+max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0
 bleed_restore               = 0

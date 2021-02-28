@@ -89,23 +89,28 @@ end
 function LevelUp(level)
 
     printf("Beginning player level up sequence.")
-
     GainStats()
     --GainImmunities()
     printf(currentLevel)
-    --Now we add the dialog box.
-    LevelUpMessage()
+    LevelUpMessage() -- Shows message when player levels up.
     printf("Level up sequence completed successfully.")
     
     return
 
 end
 
--- INCREASE PLAYER STATS (NO IMMUNITIES) --
+-- INCREASE PLAYER STATS --
 function GainStats()
 
+    --local actor = db.actor
+    -- RESTORE PLAYER HEALTH IF ENABLED --
+    local restore_health = level_system_config:r_float("config_parameters", "restore_health")
+    if (restore_health == 1) then
+        db.actor:change_health(100)
+    else end
+
     --CURRENT STAT VARIABLES--
-    local currentMaxWeight = db.actor:get_actor_max_weight()         -- Get player's max carry weight.
+    local current_max_weight = db.actor:get_actor_max_weight()         -- Get player's max carry weight.
     local current_run_coef = db.actor:get_actor_run_coef()           -- Get player's run speed factor.
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
 
@@ -117,8 +122,8 @@ function GainStats()
     health_regen_delta = level_system_config:r_float(tostring(currentLevel), "health_regen")
     --bleed_restore_delta = 
 
-    --db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
-    --db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
+    db.actor:set_actor_max_weight(current_max_weight + max_weight_delta) -- This works
+    --db.actor:cast_Actor():conditions():BoostMaxWeight(max_weight_delta) -- This appears not to.
     --db.actor:set_actor_run_coef(current_run_coef + 10)
     --db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
     --TODO For the above, might want to use the 'boost' classes
@@ -175,11 +180,9 @@ function LevelThresholdsSetup()
 
 end
 
---actor_menu.set_fade_msg( game.translate_string(v.hint), 5, nil, "device\\pda\\spot_discovered" )
-
 -- SHOW NOTIFICATION UPON LEVEL UP -- 
 function LevelUpMessage() 
     
-    actor_menu.set_fade_msg("Leveled up!", 5, nil, "device\\pda\\spot_discovered")
+    actor_menu.set_fade_msg("Leveled up to Level " .. currentLevel, 5, nil, "device\\pda\\spot_discovered")
 
 end
