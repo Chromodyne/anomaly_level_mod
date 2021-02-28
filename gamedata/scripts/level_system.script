@@ -21,7 +21,7 @@ TODO
 --Links necessary configuration files to this script.
 local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
 --local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
-level_thresholds = {}
+local level_thresholds = {}
 --immunities_gained = {}
 
 -- CONFIGURATION VARIABLES --
@@ -30,8 +30,7 @@ local currentLevel = 1;                     -- The player's current level. Must 
 local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
 
 -- SERIALIZATION/SAVE DATA--
-local m_data = {} -- m_data is where the save_state callbacks look for data to encode.
-local save_data = {}
+--local m_data = {} -- m_data is where the save_state callbacks look for data to encode.
 
 -- INITIALIZATION --
 function on_game_start()
@@ -47,12 +46,31 @@ function on_game_start()
 end
 
 -- SAVING  DATA -- 
-function save_state()
-    
+function save_state(m_data)
+
+    if (USE_MARSHAL) then
+
+        local save_data = {}
+        save_data.currentLevel = currentLevel or 1
+        save_data.currentExp = currentExp or 0
+
+        m_data.save_data = save_data
+
+    end
+
+    printf("Data saved correctly. LVLSYS")
+
 end
 
 -- LOADING DATA --
-function load_state()
+function load_state(m_data)
+
+    local save_data = m_data.save_data
+    if save_data then
+        currentLevel = save_data.currentLevel or 1
+        currentExp = save_data.currentExp or 0
+        printf("Save data loaded correctly. LVLSYS")
+    end
 
 end
 
