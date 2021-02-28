@@ -29,6 +29,10 @@ local currentExp = 0;                       -- The player's current quantity of 
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
 local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
 
+-- SERIALIZATION/SAVE DATA--
+local m_data = {} -- m_data is where the save_state callbacks look for data to encode.
+local save_data = {}
+
 -- INITIALIZATION --
 function on_game_start()
 
@@ -36,7 +40,19 @@ function on_game_start()
     RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)          -- Connected to whenever NPCs die.
     RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)   -- Connected to whenever monsters/mutants die.
     RegisterScriptCallback("actor_on_update", actor_on_update) -- Connected to whenever the player updates. Good for looping.
+    RegisterScriptCallback("save_state", save_state) -- Callback for saving data to disk via alife_storage_manager.
+    RegisterScriptCallback("load_state", load_state) -- Callback for reloading data from disk via alife_storage manager.
     ParseConfig()
+
+end
+
+-- SAVING  DATA -- 
+function save_state()
+    
+end
+
+-- LOADING DATA --
+function load_state()
 
 end
 
