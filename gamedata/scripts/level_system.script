@@ -18,15 +18,17 @@ TODO
 
 
 -- FILE LINKS --
---Keep these commented until used. Will crash otherwise.
-local config_file = ini_file("levelmod\\level_system.ltx") -- Links the configuration (ltx) file to this script.
-exp_req = {}
+--Links necessary configuration files to this script.
+local stat_gains_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
+local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
+level_thresholds = {}
+immunities_gained = {}
 
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
-local maxLevel = 4;                        -- Determines the max general level for the player.
---local breakPoints = {1000, 2000, 3000};     -- Determines how much experience is required to level up. | DEPRECATED, COMES FROM INI
+local maxLevel = 4;                         -- Determines the max general level for the player.
+--local breakPoints = {1000, 2000, 3000};     -- DEPRECATED, COMES FROM CONFIG NOW. 
 
 -- INITIALIZATION --
 -- The on_game_start function initializes the callbacks required to hook into the game.
@@ -42,8 +44,7 @@ function on_game_start()
 end
 
 
--- GRANT EXPERIENCE ON KEY PRESS (DEBUG) --
---Player gains experience just from pressing the 'C' key. For debugging purposes only.
+-- GRANT EXPERIENCE ON 'C' KEY PRESS (DEBUG) --
 function on_key_press(key)
 
     if (key == DIK_keys["DIK_C"] ) then
@@ -54,7 +55,6 @@ function on_key_press(key)
 end
 
 -- EXPERIENCE GAIN ON NPC DEATH --
---Give player exp when they kill an npc.
 --TODO : Make it where the # of exp depends on faction, "level", etc.
 function npc_on_death_callback(victim, killer)
 
@@ -74,15 +74,14 @@ end
 -- Runs various functions constantly to see if the player has gained experience, levelled up, etc.
 function actor_on_update()
 
-    LevelUp()
+    LevelUp() -- Checks to see if the player has gained enough experience to level up.
 
 end
 
 -- LEVEL UP FUNCTION --
--- Determines if the player has gained enough experience to level up. If so, begin level up process.
 function LevelUp()
 
-        if (currentExp == exp_req[currentLevel + 1] and currentLevel < maxLevel) then
+        if (currentExp == level_thresholds[currentLevel + 1] and currentLevel < maxLevel) then
             currentLevel = currentLevel + 1
             currentExp = 0 -- Didn't want to have to make each new level go back to zero exp but for some reason it loops if I do not.
             LevelUpProgression(currentLevel);
@@ -111,19 +110,18 @@ function GainStats()
     local currentMaxWeight = db.actor:get_actor_max_weight()         -- Get player's max carry weight.
     local current_run_coef = db.actor:get_actor_run_coef()           -- Get player's run speed factor.
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
-    --local current_jump_speed = db.actor:get_actor_jump_speed()
-    --TODO: Currently these are baked for every level. Later there will be an array for each level
-    --STAT CHANGE VARIABLES--
-    local increase_weight = 1                                   -- #kg weight max weight increases.
-    local increaseHealth = 2                                    -- #hp health will increase.
-    local run_speed_increase = 10                               -- Factor that run speed will increase by. (TODO)
-    local sprint_speed_increase = 12                            -- Factor that sprint speed will increase by.
-    --local currentMaxHealth = db.actor:max_health()
 
-    db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
-    db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
-    db.actor:set_actor_run_coef(current_run_coef + run_speed_increase)
-    db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
+    --STAT CHANGE VARIABLES--
+    --Determines how much the These are pulled from level_system.ltx
+    max_weight_delta   = level_system:r_float(tostring(currentLevel), "max_weight")
+    run_speed_delta    = level_system:r_float(tostring(currentLevel), "run_speed")
+    sprint_speed_delta = level_system:r_float(tostring(currentLevel), "sprint_speed")
+    health_regen_delta = level_system:r_float(tostring(currentLevel), "health_regen")
+
+    --db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
+    --db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
+    --db.actor:set_actor_run_coef(current_run_coef + run_speed_increase)
+    --db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
     --TODO For the above, might want to use the 'boost' classes
     --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
     --db.actor:set_actor_jump_speed(current_jump_speed + 1000)
@@ -134,23 +132,23 @@ end
 function GainImmunities()
 
     --TODO: Currently these are baked for every level. Use the LTX file for configuring this.
-    local gain_chemical_burn_protection = 1
-    local gain_chemical_burn_immunity = 1
-    local gain_explosion_immunity = 1
-    local gain_fire_wound_immunity = 1
-    local gain_radiation_protection = 1
-    local gain_radiation_immunity = 1
-    local gain_shock_immunity = 1
-    local gain_wound_immunity = 1
-    local gain_psy_protection = 1
-    local gain_psy_immunity = 1
+    --[[local gain_chemical_burn_protection = 1
+    local gain_chemical_burn_immunity = 
+    local gain_explosion_immunity = 
+    local gain_fire_wound_immunity = 
+    local gain_radiation_protection = 
+    local gain_radiation_immunity = 
+    local gain_shock_immunity = 
+    local gain_wound_immunity = 
+    local gain_psy_protection = 
+    local gain_psy_immunity = ]]
 
     --local casting = db.actor:cast_Ator():conditions()
 
-    db.actor:cast_Actor():conditions():BoostExplImmunity(50)
-    db.actor:cast_Actor():conditions():BoostBurnImmunity(gain_burn_immunity)
-    db.actor:cast_Actor():conditions():BoostRadiationProtection(gain_radiation_protection)
-    db.actor:cast_Actor():conditions():BoostRadiationImmunity(10)
+    --db.actor:cast_Actor():conditions():BoostExplImmunity(50)
+    --db.actor:cast_Actor():conditions():BoostBurnImmunity(gain_burn_immunity)
+    --db.actor:cast_Actor():conditions():BoostRadiationProtection(gain_radiation_protection)
+    --db.actor:cast_Actor():conditions():BoostRadiationImmunity(10)
 
 end
 
@@ -177,16 +175,18 @@ end
 -- Adds data from level_system.ltx to an array that is used to determine level up bonuses.
 function ParseConfig()
     
-    ExperienceArraySetup()
+    LevelThresholdsSetup()
 
 end
 
-function ExperienceArraySetup()
+function LevelThresholdsSetup()
 
     local i = 1
     while (i <= maxLevel) do
-        exp_req[i] = config_file:r_float(tostring(i),"exp_req")
+        level_thresholds[i] = stat_gains_config:r_float(tostring(i),"exp_req")
         i = i + 1
     end
 
 end
+
+function 
