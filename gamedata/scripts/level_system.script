@@ -27,7 +27,7 @@ level_thresholds = {}
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
-local maxLevel = 4;                         -- Determines the max general level for the player.
+local maxLevel = 10;                        -- Determines the max general level for the player.
 --local breakPoints = {1000, 2000, 3000};     -- DEPRECATED, COMES FROM CONFIG NOW. 
 
 -- INITIALIZATION --
@@ -42,7 +42,7 @@ function on_game_start()
 end
 
 
--- GRANT EXPERIENCE ON 'C' KEY PRESS (DEBUG) --
+-- GRANT EXPERIENCE ON 'C' KEY PRESS (DEBUG ONLY) --
 function on_key_press(key)
 
     if (key == DIK_keys["DIK_C"] ) then
@@ -53,7 +53,6 @@ function on_key_press(key)
 end
 
 -- EXPERIENCE GAIN ON NPC DEATH --
---TODO : Make it where the # of exp depends on faction, "level", etc.
 function npc_on_death_callback(victim, killer)
 
     CheckKiller(killer)
@@ -61,7 +60,6 @@ function npc_on_death_callback(victim, killer)
 end
 
 -- EXPERIENCE GAIN ON MONSTER DEATH --
---TODO: Vary exp based on monster/mutant that was killed. e.g. Chimera exp >> Blind Dog
 function monster_on_death_callback(victim, killer)
 
     CheckKiller(killer)
@@ -88,11 +86,12 @@ function CheckForLevelUp()
 end
 
 -- GRANT BONUSES ON LEVEL UP --
+-- TODO: Make it so the level up dialog pops up on the screen.
 function LevelUp(level)
 
     printf("Beginning player level up sequence.")
 
-    --GainStats()
+    GainStats()
     --GainImmunities()
     printf(currentLevel)
     printf("Level up sequence completed successfully.")
@@ -110,15 +109,15 @@ function GainStats()
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
 
     --STAT CHANGE VARIABLES--
-    --Determines how much the These are pulled from level_system.ltx
-    max_weight_delta   = level_system:r_float(tostring(currentLevel), "max_weight")
-    run_speed_delta    = level_system:r_float(tostring(currentLevel), "run_speed")
-    sprint_speed_delta = level_system:r_float(tostring(currentLevel), "sprint_speed")
-    health_regen_delta = level_system:r_float(tostring(currentLevel), "health_regen")
+    --Determines how much the These are pulled from stat_gains_config.ltx
+    max_weight_delta   = stat_gains_config:r_float(tostring(currentLevel), "max_weight")
+    run_speed_delta    = stat_gains_config:r_float(tostring(currentLevel), "run_speed")
+    sprint_speed_delta = stat_gains_config:r_float(tostring(currentLevel), "sprint_speed")
+    health_regen_delta = stat_gains_config:r_float(tostring(currentLevel), "health_regen")
 
     --db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
     --db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
-    --db.actor:set_actor_run_coef(current_run_coef + run_speed_increase)
+    --db.actor:set_actor_run_coef(current_run_coef + 10)
     --db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
     --TODO For the above, might want to use the 'boost' classes
     --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
@@ -170,13 +169,14 @@ function GrantExperience()
 end
 
 -- PARSE CONFIGURATION FILE --
--- Adds data from level_system.ltx to an array that is used to determine level up bonuses.
 function ParseConfig()
     
     LevelThresholdsSetup()
+    printdbg("parsed")
 
 end
 
+-- SETS UP ARRAY THAT DETERMINES LEVEL UP EXP REQS --
 function LevelThresholdsSetup()
 
     local i = 1
