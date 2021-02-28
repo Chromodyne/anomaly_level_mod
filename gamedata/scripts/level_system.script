@@ -19,7 +19,7 @@ TODO
 
 -- FILE LINKS --
 --Links necessary configuration files to this script.
-local stat_gains_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
+local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
 --local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
 level_thresholds = {}
 --immunities_gained = {}
@@ -27,8 +27,7 @@ level_thresholds = {}
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
-local maxLevel = 10;                        -- Determines the max general level for the player.
---local breakPoints = {1000, 2000, 3000};     -- DEPRECATED, COMES FROM CONFIG NOW. 
+local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
 
 -- INITIALIZATION --
 function on_game_start()
@@ -94,13 +93,15 @@ function LevelUp(level)
     GainStats()
     --GainImmunities()
     printf(currentLevel)
+    --Now we add the dialog box.
+    LevelUpMessage()
     printf("Level up sequence completed successfully.")
     
     return
 
 end
 
--- INCREASE STATS (NO IMMUNITIES) --
+-- INCREASE PLAYER STATS (NO IMMUNITIES) --
 function GainStats()
 
     --CURRENT STAT VARIABLES--
@@ -109,11 +110,12 @@ function GainStats()
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
 
     --STAT CHANGE VARIABLES--
-    --Determines how much the These are pulled from stat_gains_config.ltx
-    max_weight_delta   = stat_gains_config:r_float(tostring(currentLevel), "max_weight")
-    run_speed_delta    = stat_gains_config:r_float(tostring(currentLevel), "run_speed")
-    sprint_speed_delta = stat_gains_config:r_float(tostring(currentLevel), "sprint_speed")
-    health_regen_delta = stat_gains_config:r_float(tostring(currentLevel), "health_regen")
+    --Determines how much the These are pulled from level_system_config.ltx
+    max_weight_delta   = level_system_config:r_float(tostring(currentLevel), "max_weight")
+    run_speed_delta    = level_system_config:r_float(tostring(currentLevel), "run_speed")
+    sprint_speed_delta = level_system_config:r_float(tostring(currentLevel), "sprint_speed")
+    health_regen_delta = level_system_config:r_float(tostring(currentLevel), "health_regen")
+    --bleed_restore_delta = 
 
     --db.actor:change_health(100) -- Testing. This restores the player HP back to maximum on levelup.
     --db.actor:set_actor_max_weight(currentMaxWeight + increase_weight) -- Testing. This increases the characters maximum carry weight.
@@ -125,22 +127,8 @@ function GainStats()
 
 end
 
--- INCREASE PLAYER IMMUNITIES --
+-- INCREASE PLAYER IMMUNITIES & RESISTANCES --
 function GainImmunities()
-
-    --TODO: Currently these are baked for every level. Use the LTX file for configuring this.
-    --[[local gain_chemical_burn_protection = 1
-    local gain_chemical_burn_immunity = 
-    local gain_explosion_immunity = 
-    local gain_fire_wound_immunity = 
-    local gain_radiation_protection = 
-    local gain_radiation_immunity = 
-    local gain_shock_immunity = 
-    local gain_wound_immunity = 
-    local gain_psy_protection = 
-    local gain_psy_immunity = ]]
-
-    --local casting = db.actor:cast_Ator():conditions()
 
     --db.actor:cast_Actor():conditions():BoostExplImmunity(50)
     --db.actor:cast_Actor():conditions():BoostBurnImmunity(gain_burn_immunity)
@@ -181,8 +169,17 @@ function LevelThresholdsSetup()
 
     local i = 1
     while (i <= maxLevel) do
-        level_thresholds[i] = stat_gains_config:r_float(tostring(i),"exp_req")
+        level_thresholds[i] = level_system_config:r_float(tostring(i),"exp_req")
         i = i + 1
     end
+
+end
+
+--actor_menu.set_fade_msg( game.translate_string(v.hint), 5, nil, "device\\pda\\spot_discovered" )
+
+-- SHOW NOTIFICATION UPON LEVEL UP -- 
+function LevelUpMessage() 
+    
+    actor_menu.set_fade_msg("Leveled up!", 5, nil, "device\\pda\\spot_discovered")
 
 end

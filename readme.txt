@@ -1,8 +1,8 @@
 =================================================
 =                                               =
-=            Zone Leveling Mod                  =
+=             Zone Leveling Mod                 =
 =               Version 0.01                    =
-=         Updated: 02/27/21 @ 18:13             =
+=          Updated: 02/27/21 @ 18:13            =
 =                                               =
 =================================================
 
@@ -13,6 +13,19 @@ Contact Info/Support
       Discord: Chromodyne#6925
       Discord Server: https://discord.gg/cTWduNNS
       Patreon:
+
+Copyright Info/Legal Stuff
+
+    Copyright 2021 Chromodyne - All Rights Reserved
+
+    Chromodyne, henceforth 'the creator' is the sole owner of this addon.
+    Modifications or forks of this addon are forbidden without the express, written permission of the creator.
+    Use of this addon as a basis for another addon is forbidden without the express, written permision of the creator.
+    This addon may be freely redistributed in its original state with proper attribution given to the creator.
+    The creator holds no responsibility for damage that may arise from use of this addon. 
+
+    Seriously, just contact me if you want to discuss what's allowed. :)
+
 
 ==============
 =INSTALLATION=
@@ -37,8 +50,6 @@ certain amount of these points the player will level-up, increasing their stats.
 The exact details can be found in:
 
     \gamedata\configs\levelmod\level_system.ltx
-
-
 
 
 ==================
@@ -69,8 +80,14 @@ The exact details can be found in:
         i.e. Strength, Stamina, Restances, Toughness, etc. that level up when doing relevant activities and tasks.
 
         Get better at various things by doing them.
+    
+    ====================
+    =DISTANT FUTURE n/a=
+    ====================
 
+    NOTE: These may not be viable. Don't hold your breath.
 
+    1. Level system for NPC Stalkers.
 
 
 THIS README IS A WORK IN PROGRESS.
