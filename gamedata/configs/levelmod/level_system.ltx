@@ -2,34 +2,46 @@
 ;                                     ;
 ;                                     ;
 ;   Level System Configuration File   ;
-;           Version 0.01              ;
+;           Version 0.02              ;
+;        Updated:02/27/21 @ 18:13     ;         
+;                                     ;
 ;                                     ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;ABOUT: This file contains the configuration parameters of the Level System.
-;Using this you can tweak the bonuses gained on level up to your liking.
-
-
+;Using this you can tweak the bonuses gained on each level up to your liking.
 
 ;NOTE: THIS CONFIGURATION FILE AS WELL AS THE LEVEL SYSTEM IS A WORK IN PROGRESS - Chromodyne
-; All numbers denote increase in stat/immunity.
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;; HELPFUL HINTS ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 1. Sections indicate the different levels. e.g [1] = Level 1 (starting), [2] = Level 2, etc.
+; 2. Do not attempt to edit Level 1 bonuses. This may cause various issues. All other level can be edited freely.
+; 3. All numbers denote increases in stat/immunity.
+; 4. Immunity is a chance to complete negate that damage type while resist reduces damage or effects.
+; 5. Read comments next to the level 1 stats for a description of what each does.
+; 6. Increasing run/sprint speed by too much can cause a variety of issues with actor locomotion.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; LEVEL 1 - LEAVE THIS LEVEL ALONE! MAY CAUSE INSTABILITY/OTHER ISSUES IF ALTERED!
 [1]
-exp_req                     = 0
-max_weight                  = 0
-run_speed                   = 0
-sprint_speed                = 0
-health_regen                = 0
-burn_immunity 				= 0
-strike_immunity 			= 0
-shock_immunity 				= 0
-wound_immunity				= 0
-radiation_immunity 			= 0
-telepatic_immunity 			= 0
-chemical_burn_immunity 		= 0
-explosion_immunity 			= 0
-fire_wound_immunity  		= 0
+exp_req                     = 0 ; Experience required to reach level.
+max_weight                  = 0 ; Increase max carry weight by this amount.
+run_speed                   = 0 ; Increase max run speeed by this amount.
+sprint_speed                = 0 ; Increase max sprint speed by this amount.
+health_regen                = 0 ; Increase health regen by this amount per second.
+burn_immunity 				= 0 ; Increase chance to negate burn damage by this amount.
+strike_immunity 			= 0 ; Increase chance to negate strike damage by this amount.
+shock_immunity 				= 0 ; Increase chance to negate shockdamage by this amount.
+wound_immunity				= 0 ; Increase chance to negate wound damage by this amount.
+radiation_immunity 			= 0 ; Increase chance to negate burn damage by this amount.
+telepatic_immunity 			= 0 ; Increase chance to negate burn damage by this amount.
+chemical_burn_immunity 		= 0 ; Increase chance to negate burn damage by this amount.
+explosion_immunity 			= 0 ; Increase chance to negate burn damage by this amount.
+fire_wound_immunity  		= 0 ; Increase chance to negate burn damage by this amount.
 
+; LEVEL 2
 [2]
 exp_req                     = 1000
 max_weight                  = 0.5
@@ -49,6 +61,7 @@ chemical_burn_immunity 		= 0
 explosion_immunity 			= 0
 fire_wound_immunity  		= 0
 
+; LEVEL 3
 [3]
 exp_req                     = 2000
 max_weight                  = 0.5
@@ -70,6 +83,120 @@ fire_wound_immunity  		= 0
 
 [4]
 exp_req                     = 3000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[5]
+exp_req                     = 4000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[6]
+exp_req                     = 5000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[7]
+exp_req                     = 6000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[8]
+exp_req                     = 7000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[9]
+exp_req                     = 8000
+max_weight                  = 0.5
+run_speed                   = 0
+sprint_speed                = 0
+health_regen                = 0
+burn_immunity 				= 0
+strike_immunity 			= 0
+shock_immunity 				= 0
+wound_immunity				= 0
+radiation_protection        = 0
+radiation_immunity 			= 0
+telepatic_protection        = 0
+telepatic_immunity 			= 0
+chemical_burn_protection    = 0
+chemical_burn_immunity 		= 0
+explosion_immunity 			= 0
+fire_wound_immunity  		= 0
+
+[10]
+exp_req                     = 9000
 max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0

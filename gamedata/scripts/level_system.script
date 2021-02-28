@@ -20,9 +20,9 @@ TODO
 -- FILE LINKS --
 --Links necessary configuration files to this script.
 local stat_gains_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
-local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
+--local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
 level_thresholds = {}
-immunities_gained = {}
+--immunities_gained = {}
 
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
@@ -31,8 +31,6 @@ local maxLevel = 4;                         -- Determines the max general level 
 --local breakPoints = {1000, 2000, 3000};     -- DEPRECATED, COMES FROM CONFIG NOW. 
 
 -- INITIALIZATION --
--- The on_game_start function initializes the callbacks required to hook into the game.
--- The second parameter for each function can be changed to whatever you want the function name to be for better code readability. Remember to rename the functions as well!
 function on_game_start()
 
     RegisterScriptCallback("on_key_press", on_key_press)                            -- Connected to whenever 
@@ -74,23 +72,23 @@ end
 -- Runs various functions constantly to see if the player has gained experience, levelled up, etc.
 function actor_on_update()
 
-    LevelUp() -- Checks to see if the player has gained enough experience to level up.
+    CheckForLevelUp() -- Checks to see if the player has gained enough experience to level up.
 
 end
 
 -- LEVEL UP FUNCTION --
-function LevelUp()
+function CheckForLevelUp()
 
         if (currentExp == level_thresholds[currentLevel + 1] and currentLevel < maxLevel) then
             currentLevel = currentLevel + 1
             currentExp = 0 -- Didn't want to have to make each new level go back to zero exp but for some reason it loops if I do not.
-            LevelUpProgression(currentLevel);
+            LevelUp(currentLevel);
         else end
 
 end
 
 -- GRANT BONUSES ON LEVEL UP --
-function LevelUpProgression(level)
+function LevelUp(level)
 
     printf("Beginning player level up sequence.")
 
@@ -188,5 +186,3 @@ function LevelThresholdsSetup()
     end
 
 end
-
-function 
