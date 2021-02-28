@@ -25,8 +25,8 @@ exp_req = {}
 -- CONFIGURATION VARIABLES --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
-local maxLevel = 20;                        -- Determines the max general level for the player.
-local breakPoints = {1000, 2000, 3000};     -- Determines how much experience is required to level up.
+local maxLevel = 4;                        -- Determines the max general level for the player.
+--local breakPoints = {1000, 2000, 3000};     -- Determines how much experience is required to level up. | DEPRECATED, COMES FROM INI
 
 -- INITIALIZATION --
 -- The on_game_start function initializes the callbacks required to hook into the game.
@@ -58,7 +58,7 @@ end
 --TODO : Make it where the # of exp depends on faction, "level", etc.
 function npc_on_death_callback(victim, killer)
 
-    CheckKiller()
+    CheckKiller(killer)
 
 end
 
@@ -66,7 +66,7 @@ end
 --TODO: Vary exp based on monster/mutant that was killed. e.g. Chimera exp >> Blind Dog
 function monster_on_death_callback(victim, killer)
 
-    CheckKiller()
+    CheckKiller(killer)
 
 end
 
@@ -82,7 +82,7 @@ end
 -- Determines if the player has gained enough experience to level up. If so, begin level up process.
 function LevelUp()
 
-        if (currentExp == exp_req[2]  and currentLevel < maxLevel) then
+        if (currentExp == exp_req[currentLevel + 1] and currentLevel < maxLevel) then
             currentLevel = currentLevel + 1
             currentExp = 0 -- Didn't want to have to make each new level go back to zero exp but for some reason it loops if I do not.
             LevelUpProgression(currentLevel);
@@ -95,9 +95,9 @@ function LevelUpProgression(level)
 
     printf("Beginning player level up sequence.")
 
-    GainStats()
-    GainImmunities()
-
+    --GainStats()
+    --GainImmunities()
+    printf(currentLevel)
     printf("Level up sequence completed successfully.")
     
     return
@@ -155,7 +155,7 @@ function GainImmunities()
 end
 
 -- CHECK IF PLAYER WAS KILLER -- 
-function CheckKiller()
+function CheckKiller(killer)
 
     local id = killer:id()
 
@@ -176,8 +176,17 @@ end
 -- PARSE CONFIGURATION FILE --
 -- Adds data from level_system.ltx to an array that is used to determine level up bonuses.
 function ParseConfig()
+    
+    ExperienceArraySetup()
 
-    exp_req[1] = config_file:r_float("1","exp_req")
-    exp_req[2] = config_file:r_float("2","exp_req")
+end
+
+function ExperienceArraySetup()
+
+    local i = 1
+    while (i <= maxLevel) do
+        exp_req[i] = config_file:r_float(tostring(i),"exp_req")
+        i = i + 1
+    end
 
 end
