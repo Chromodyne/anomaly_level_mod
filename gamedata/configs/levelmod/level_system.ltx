@@ -2,7 +2,7 @@
 ;                                     ;
 ;                                     ;
 ;   Level System Configuration File   ;
-;           Version 0.02              ;
+;           Version 0.02a             ;
 ;        Updated:02/27/21 @ 18:13     ;         
 ;                                     ;
 ;                                     ;
@@ -10,30 +10,31 @@
 
 ;ABOUT: This file contains the configuration parameters of the Level System.
 ;Using this you can tweak the bonuses gained on each level up to your liking.
+;If you have tweaked this while following the instructions and end up with crashes
+;or bugs then please post them in the discord.
 
 ;NOTE: THIS CONFIGURATION FILE AS WELL AS THE LEVEL SYSTEM IS A WORK IN PROGRESS - Chromodyne
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;; HELPFUL HINTS ;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;; HELPFUL HINTS - READ THIS ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 1. Sections indicate the different levels. e.g [1] = Level 1 (starting), [2] = Level 2, etc.
 ; 2. Do not attempt to edit Level 1 bonuses. This may cause various issues. All other level can be edited freely.
-; 3. All numbers denote increases in stat/immunity.
+; 3. All numbers denote increases in stat/immunity as floats.
 ; 4. Immunity is a chance to completely negate that damage type while resist reduces damage or effects.
-; 5. Read comments next to the level 1 stats for a description of what each one does.
+; 5. Level 1 has comments next to each item to describe what they do. Read them.
 ; 6. Increasing run/sprint speed by too much can cause a variety of issues with actor locomotion.
-; 7. You cannot skip levels. Due to a code limitation, experience resets to 0 at level up.
-; 8. I know of the typos and weird naming conventions. I am doing this for consistency with the Anomaly codebase naming.
+; 7. You cannot skip levels. Experience resets to zero at level up currently. Eventually all additional will be accounted/levels may be skipped.
+; 8. I know of the typos (i.e. "telepatic") and weird naming conventions. I am doing this for consistency with Stalker/Anomaly codebase naming scheme.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; This section is for basic changes. You can increase max leve cap, etc.
 [config_parameters]
-max_level                   = 10 ; Sets max level that can be attained. (Default: 10)
-current_level               = 1  ; Determines player's current level. UNUSED
-restore_health              = 0  ; If set to 1 (true) the player gains full health when leveling up. (Default: 0)
+max_level                   = 10     ; Sets max level that can be attained. (Default: 10)
+restore_health              = false  ; Determines whether the player's health is restored on level up. (Default: false)
 
-; LEVEL 1 - WARNING: DO NOT CHANGE THE VALUES FOR LEVEL 1. RISK OF INSTABILITY.
-[1]
+;WARNING! DO NOT CHANGE THE VALUES FOR level_1. RISK OF INSTABILITY.
+[level_1]
 exp_req                     = 0 ; Required experience to reach this level.
 max_weight                  = 0 ; Increase max carry weight by this amount.
 run_speed                   = 0 ; Increase max run speeed by this amount (%).
@@ -54,8 +55,7 @@ telepatic_protection        = 0 ; Increase protection against psy damage by this
 telepatic_immunity 			= 0 ; Increase chance to negate psy damage by this amount.
 wound_immunity              = 0 ; Increase chance to negate bleeding by this amount.
 
-;LEVEL 2
-[2]
+[level_2]
 exp_req                     = 1000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -76,8 +76,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-;LEVEL 3
-[3]
+[level_3]
 exp_req                     = 2000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -98,7 +97,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[4]
+[level_4]
 exp_req                     = 3000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -119,7 +118,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[5]
+[level_5]
 exp_req                     = 4000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -140,7 +139,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[6]
+[level_6]
 exp_req                     = 5000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -161,7 +160,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[7]
+[level_7]
 exp_req                     = 6000
 max_weight                  = 0.5
 run_speed                   = 0
@@ -182,7 +181,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[8]
+[level_8]
 exp_req                     = 7000
 max_weight                  = 0
 run_speed                   = 0
@@ -203,7 +202,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[9]
+[level_9]
 exp_req                     = 8000
 max_weight                  = 0
 run_speed                   = 0
@@ -224,7 +223,7 @@ telepatic_protection        = 0
 telepatic_immunity 			= 0
 wound_immunity              = 0
 
-[10]
+[level_10]
 exp_req                     = 9000
 max_weight                  = 0
 run_speed                   = 0

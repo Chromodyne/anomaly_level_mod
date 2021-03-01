@@ -65,8 +65,10 @@ The exact details can be found in:
 
     1. Experience points from kills are based on the relative difficulty of entity killed.
         e.g. A Chimera will grant much more experience than a Flesh.
-    2. Experience point loss on death. (Optional)
-    3. A placeholder UI for the mod.
+    2. Difficulty based stat increases.
+        e.g. Higher difficulty levels will reduce stat gains on level up.
+    3. Experience point loss on death. (Optional)
+    4. A placeholder UI for the mod.
 
     ===============================
     =FURTHER ALONG (6 - 12 months)=
