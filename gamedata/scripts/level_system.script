@@ -233,15 +233,12 @@ function FindPlayerStats()
 
     local stat_gains_per_level = {}
 
-    
     --[[
     while (i <= maxLevel) do
         player_stats[i] = level_system_config:r_float(tostring(i))
         i = i + 1
     end
     ]]
-
-
 
     --[[
 
@@ -252,8 +249,6 @@ function FindPlayerStats()
         3,
 
     }
-
-
 
     ]]
 
@@ -287,15 +282,19 @@ function FindPlayerStats()
 --end
 ]]
 
-
 -- DETERMINE DIFFICULTY LEVEL --
 --This function is needed because it seems to be the only easy way to find the current save's actor's base stats.
 function CheckBaseImmunities()
 
     local base_immunities = {}
-
     base_immunities["base_immunities"] = game_difficulties.get_game_factor("actor_immunities")
     
     printf("Base immunities imported. =)")
+
+end
+
+--Determines what the player's immunity boosts should be based on their level.
+function CheckTotalBoosts()
+
 
 end
