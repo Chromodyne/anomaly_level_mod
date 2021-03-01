@@ -31,10 +31,10 @@
 
 ; This section is for basic changes. You can increase max leve cap, etc.
 [config_parameters]
-max_level                   = 10     ; Sets max level that can be attained. (Default: 10)
-restore_health              = false  ; Determines whether the player's health is restored on level up. (Default: false)
-show_current_exp            = "V"    ; Text appears showing how much exp the player has. (PLACEHOLDER UNTIL UI IMPLEMENTED)
-show_exp_remaining          = "B"    ; Text appears showing how much is left until the next level. (PLACEHOLDER UNTIL UI IMPLEMENTED)
+max_level                   = 10      ; Sets max level that can be attained. (Default: 10)
+restore_health              = false   ; Determines whether the player's health is restored on level up. (Default: false)
+show_current_exp            = "DIK_V" ; Currently unused.
+show_remaining_exp          = "DIK_B" ; Currently unused.
 
 ;WARNING! DO NOT CHANGE THE VALUES FOR level_1. RISK OF INSTABILITY.
 [level_1]
@@ -124,10 +124,10 @@ wound_immunity              = 0
 [level_5]
 exp_req                     = 7000
 max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+run_speed                   = 1.005
+sprint_speed                = 1.005
 bleed_restore               = 0
-health_regen                = 0
+health_regen                = 0.005
 burn_immunity 				= 0
 chemical_burn_protection    = 0
 chemical_burn_immunity 		= 0
@@ -145,8 +145,8 @@ wound_immunity              = 0
 [level_6]
 exp_req                     = 5000
 max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+run_speed                   = 1.005
+sprint_speed                = 1.005
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -166,8 +166,8 @@ wound_immunity              = 0
 [level_7]
 exp_req                     = 6000
 max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+run_speed                   = 1.005
+sprint_speed                = 1.005
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -186,9 +186,9 @@ wound_immunity              = 0
 
 [level_8]
 exp_req                     = 7000
-max_weight                  = 0
-run_speed                   = 0
-sprint_speed                = 0
+max_weight                  = 0.5
+run_speed                   = 1.0
+sprint_speed                = 1.0
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -207,9 +207,9 @@ wound_immunity              = 0
 
 [level_9]
 exp_req                     = 8000
-max_weight                  = 0
-run_speed                   = 0
-sprint_speed                = 0
+max_weight                  = 0.5
+run_speed                   = 1.0
+sprint_speed                = 1.0
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -228,9 +228,9 @@ wound_immunity              = 0
 
 [level_10]
 exp_req                     = 9000
-max_weight                  = 0
-run_speed                   = 0
-sprint_speed                = 0
+max_weight                  = 0.25
+run_speed                   = 1.0
+sprint_speed                = 1.005
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0

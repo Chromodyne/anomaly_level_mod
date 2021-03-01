@@ -2,9 +2,9 @@
 Zone Progression Mod
 
 Created By: Chromodyne
-Version: 0.02a (Alpha Build - Not for distribution.)
+Version: 0.01a (Alpha Build - Not for distribution.)
 Created: 02/25/21
-Updated: 02/27/21
+Updated: 03/01/21
 
 Notes: Currently this addon only creates a rudimentary level and experience system for the player. Right now it only gives 'general' exp but I want to eventually make it able to have different skills to level up. 
 I also eventually hope to make it able to account for NPCs gaining experience as well but time will tell if that's feasible. 
@@ -76,14 +76,27 @@ end
 -- KEY PRESS FUNCTIONS --
 function on_key_press(key)
 
+    -- These setup the ability to modify the key presses from the config file. TODO Unused
+    --local show_current_exp = level_system_config:r_string("config_parameters","show_current_exp")
+    --local show_remaining_exp = level_system_config:r_string("config_parameters","show_remaining_exp")
+
+    local remaining_exp = level_thresholds[currentLevel + 1] - currentExp -- Determines exp to level.
+    -- local debug_gain_exp = . . .
+
     if (key == DIK_keys["DIK_C"] ) then -- Grant 500exp when 'C' is pressed. DEBUG ONLY
         currentExp = currentExp + 500
+        printf(show_current_exp)
     end
 
-    if (key == DIK_keys["DIK_V"] ) then -- Show player their currentExp when 'V' is pressed.
-        actor_menu.set_fade_msg("Your current exp is: " .. currentExp, 5, nil, "device\\pda\\spot_discovered")
+    -- TODO Hard code this until workaround is found.
+    if (key == DIK_keys["DIK_V"] ) then -- Show player their currentExp and exptolevel when 'V' is pressed.
+        actor_menu.set_fade_msg("Your current exp is: " .. currentExp .. " Remaining exp: " .. remaining_exp , 5, nil, "device\\pda\\spot_discovered")
     end
 
+    -- Debug key to print various values to console.
+    if (key == DIK_keys["DIK_]"] ) then
+        CheckStatValues()
+    end
 
 end
 
@@ -129,16 +142,14 @@ function CheckForLevelUp()
 end
 
 -- GRANT BONUSES ON LEVEL UP --
--- TODO: Make it so the level up dialog pops up on the screen.
 function LevelUp(level)
 
-    printf("Beginning player level up sequence.")
-    GainStats()
+    printdbg("Beginning player level up sequence.")
+    --GainStats()
     --GainImmunities()
-    printf(currentLevel)
     LevelUpMessage() -- Shows message when player levels up.
-    printf("Level up sequence completed successfully.")
-    
+    printdbg("Level up sequence completed successfully.")
+
     return
 
 end
@@ -146,8 +157,8 @@ end
 -- INCREASE PLAYER STATS --
 function GainStats()
 
-    -- These will be used later for more accurate run speed increases.--
-    -- Currently the percentage gains are skewed as they are based off current instead of base. --
+    --These will be used later for more accurate run speed increases.--
+    --Currently the percentage gains are skewed as they are based off current instead of base. --
     --local base_run_coef = 2.41
     --local base_sprint_koef = 2.08
 
@@ -161,6 +172,7 @@ function GainStats()
     local current_max_weight = db.actor:get_actor_max_weight()       -- Get player's max carry weight.
     local current_run_coef = db.actor:get_actor_run_coef()           -- Get player's run speed factor.
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
+    --local current_health_regen                                       -- TODO Might need to be initialized in the global scope.
 
     --STAT CHANGE VARIABLES--
     --Determines how much the applicable stat increases These are pulled from level_system_config.ltx
@@ -170,22 +182,20 @@ function GainStats()
     health_regen_delta = level_system_config:r_float("level_" .. tostring(currentLevel), "health_regen")
 
     -- Set new values. --
-    db.actor:set_actor_max_weight(current_max_weight + max_weight_delta)
-    db.actor:set_actor_run_coef(current_run_coef * run_speed_delta)
-    db.actor:set_actor_sprint_koef(current_sprint_coef * sprint_speed_delta)
+    db.actor:set_actor_max_weight(current_max_weight + max_weight_delta)        -- Increase max carry weight.
+    db.actor:set_actor_run_coef(current_run_coef * run_speed_delta)             -- Multiply run speed.
+    db.actor:set_actor_sprint_koef(current_sprint_coef * sprint_speed_delta)    -- Multiply spring speed.
+    --db.actor.cast_Actor().conditions().BoostHpRestore(current_health_regen + health_regen_delta) = current_health_regen
+    
 
-    --bleed_restore_delta = 
-
-    --db.actor:set_actor_max_weight(current_max_weight + max_weight_delta) -- This works
-    --db.actor:set_actor_run_coef(current_run_coef + 10)
    -- db.actor.cast_Actor().conditions():BoostExplImmunity(1000)
-    --db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
     --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
     --db.actor:set_actor_jump_speed(current_jump_speed + 1000)
 
 end
 
 -- INCREASE PLAYER IMMUNITIES & RESISTANCES --
+-- TODO : implement this!
 function GainImmunities()
 
     --db.actor:cast_Actor():conditions():BoostExplImmunity(50)
@@ -195,7 +205,7 @@ function GainImmunities()
 
 end
 
--- CHECK IF PLAYER WAS KILLER -- 
+-- CHECK KILLER ON MOB/NPC DEATH -- 
 function CheckKiller(killer)
 
     local id = killer:id()
@@ -218,7 +228,7 @@ end
 function ParseConfig()
     
     LevelThresholdsSetup()
-    printdbg("parsed")
+    printdbg("Config successfully parsed.")
 
 end
 
@@ -263,8 +273,10 @@ end
 -- PRINT ALL STAT VALUES - DEBUG ONLY --
 function CheckStatValues()
 
+    printf("Max weight: " .. db.actor:get_actor_max_weight())
     printf("Run coef: " .. db.actor:get_actor_run_coef())
     printf("Sprint koef: " .. db.actor:get_actor_sprint_koef())
+    -- TODO printf("Health Regen: ")
 
 end
 
