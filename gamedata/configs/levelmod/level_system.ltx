@@ -15,30 +15,33 @@
 
 ;NOTE: THIS CONFIGURATION FILE AS WELL AS THE LEVEL SYSTEM IS A WORK IN PROGRESS - Chromodyne
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;; HELPFUL HINTS - READ THIS ;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; 1. Sections indicate the different levels. e.g [1] = Level 1 (starting), [2] = Level 2, etc.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;; READ THIS ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 1. Sections indicate the different levels.
 ; 2. Do not attempt to edit Level 1 bonuses. This may cause various issues. All other level can be edited freely.
 ; 3. All numbers denote increases in stat/immunity as floats.
-; 4. Immunity is a chance to completely negate that damage type while resist reduces damage or effects.
-; 5. Level 1 has comments next to each item to describe what they do. Read them.
-; 6. Increasing run/sprint speed by too much can cause a variety of issues with actor locomotion.
-; 7. You cannot skip levels. Experience resets to zero at level up currently. Eventually all additional will be accounted/levels may be skipped.
-; 8. I know of the typos (i.e. "telepatic") and weird naming conventions. I am doing this for consistency with Stalker/Anomaly codebase naming scheme.
+; 4. Run and sprint values are percentages. They MUST be >= 1 or you will lose speed. 1 denotes no change for that level.
+; 5. Immunity is a chance to completely negate that damage type while resist reduces damage or effects.
+; 6. Level 1 has comments next to each item to describe what they do. Read them.
+; 7. Increasing run/sprint speed by too much can cause a variety of issues with actor locomotion.
+; 8. You cannot skip levels. Experience resets to zero at level up currently. Eventually all additional will be accounted/levels may be skipped.
+; 9. I know of the typos (i.e. "telepatic") and weird naming conventions. I am doing this for consistency with Stalker/Anomaly codebase naming scheme.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; This section is for basic changes. You can increase max leve cap, etc.
 [config_parameters]
 max_level                   = 10     ; Sets max level that can be attained. (Default: 10)
 restore_health              = false  ; Determines whether the player's health is restored on level up. (Default: false)
+show_current_exp            = "V"    ; Text appears showing how much exp the player has. (PLACEHOLDER UNTIL UI IMPLEMENTED)
+show_exp_remaining          = "B"    ; Text appears showing how much is left until the next level. (PLACEHOLDER UNTIL UI IMPLEMENTED)
 
 ;WARNING! DO NOT CHANGE THE VALUES FOR level_1. RISK OF INSTABILITY.
 [level_1]
 exp_req                     = 0 ; Required experience to reach this level.
 max_weight                  = 0 ; Increase max carry weight by this amount.
-run_speed                   = 0 ; Increase max run speeed by this amount (%).
-sprint_speed                = 0 ; Increase max sprint speed by this amount (%)
+run_speed                   = 0 ; Increase (multiply) max run speed by this amount. (%)
+sprint_speed                = 0 ; Increase (multiply) max sprint speed by this amount. (%)
 bleed_restore               = 0 ; Increases bleed recovery by this amount.
 health_regen                = 0 ; Increase health regen by this amount per second.
 burn_immunity 				= 0 ; Increase chance to negate burn damage by this amount.
@@ -56,10 +59,10 @@ telepatic_immunity 			= 0 ; Increase chance to negate psy damage by this amount.
 wound_immunity              = 0 ; Increase chance to negate bleeding by this amount.
 
 [level_2]
-exp_req                     = 1000
-max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+exp_req                     = 2100
+max_weight                  = 0.25
+run_speed                   = 1.005
+sprint_speed                = 1.005
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -77,10 +80,10 @@ telepatic_immunity 			= 0
 wound_immunity              = 0
 
 [level_3]
-exp_req                     = 2000
-max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+exp_req                     = 3700
+max_weight                  = 0.25
+run_speed                   = 1.005
+sprint_speed                = 1.0
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -98,10 +101,10 @@ telepatic_immunity 			= 0
 wound_immunity              = 0
 
 [level_4]
-exp_req                     = 3000
+exp_req                     = 6000
 max_weight                  = 0.5
-run_speed                   = 0
-sprint_speed                = 0
+run_speed                   = 1.0
+sprint_speed                = 1.005
 bleed_restore               = 0
 health_regen                = 0
 burn_immunity 				= 0
@@ -119,7 +122,7 @@ telepatic_immunity 			= 0
 wound_immunity              = 0
 
 [level_5]
-exp_req                     = 4000
+exp_req                     = 7000
 max_weight                  = 0.5
 run_speed                   = 0
 sprint_speed                = 0

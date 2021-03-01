@@ -51,6 +51,7 @@ function save_state(m_data)
         local save_data = {}
         save_data.currentLevel = currentLevel or 1
         save_data.currentExp = currentExp or 0
+        --save_data.currentStats = nil
 
         m_data.save_data = save_data
 
@@ -72,13 +73,17 @@ function load_state(m_data)
 
 end
 
--- GRANT EXPERIENCE ON 'C' KEY PRESS (DEBUG ONLY) --
+-- KEY PRESS FUNCTIONS --
 function on_key_press(key)
 
-    if (key == DIK_keys["DIK_C"] ) then
+    if (key == DIK_keys["DIK_C"] ) then -- Grant 500exp when 'C' is pressed. DEBUG ONLY
         currentExp = currentExp + 500
-        printf(currentExp)
     end
+
+    if (key == DIK_keys["DIK_V"] ) then -- Show player their currentExp when 'V' is pressed.
+        actor_menu.set_fade_msg("Your current exp is: " .. currentExp, 5, nil, "device\\pda\\spot_discovered")
+    end
+
 
 end
 
@@ -106,10 +111,19 @@ end
 -- LEVEL UP FUNCTION --
 function CheckForLevelUp()
 
-        if (currentExp == level_thresholds[currentLevel + 1] and currentLevel < maxLevel) then
+        if (currentExp >= level_thresholds[currentLevel + 1] and currentLevel < maxLevel) then
+
             currentLevel = currentLevel + 1 -- Increment current level if condition met.
-            currentExp = 0 -- Resets current exp back to zero after level increases.
+            
+            --If the player overshot the exp threshold then the excess is added to progress towards the next level.
+            if (currentExp > level_thresholds[currentLevel]) then
+                currentExp = currentExp - level_thresholds[currentLevel]
+            else 
+                currentExp = 0
+            end
+
             LevelUp(currentLevel);
+
         else end
 
 end
@@ -119,7 +133,7 @@ end
 function LevelUp(level)
 
     printf("Beginning player level up sequence.")
-    --GainStats()
+    GainStats()
     --GainImmunities()
     printf(currentLevel)
     LevelUpMessage() -- Shows message when player levels up.
@@ -132,8 +146,12 @@ end
 -- INCREASE PLAYER STATS --
 function GainStats()
 
-    --local actor = db.actor
-    -- RESTORE PLAYER HEALTH IF ENABLED --
+    -- These will be used later for more accurate run speed increases.--
+    -- Currently the percentage gains are skewed as they are based off current instead of base. --
+    --local base_run_coef = 2.41
+    --local base_sprint_koef = 2.08
+
+    -- RESTORE PLAYER HEALTH (If enabled in config.) --
     local restore_health = level_system_config:r_bool("config_parameters", "restore_health")
     if (restore_health == true) then
         db.actor:change_health(100)
@@ -145,15 +163,20 @@ function GainStats()
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
 
     --STAT CHANGE VARIABLES--
-    --Determines how much the These are pulled from level_system_config.ltx
-    max_weight_delta   = level_system_config:r_float(tostring(currentLevel), "max_weight")
-    run_speed_delta    = level_system_config:r_float(tostring(currentLevel), "run_speed")
-    sprint_speed_delta = level_system_config:r_float(tostring(currentLevel), "sprint_speed")
-    health_regen_delta = level_system_config:r_float(tostring(currentLevel), "health_regen")
+    --Determines how much the applicable stat increases These are pulled from level_system_config.ltx
+    max_weight_delta   = level_system_config:r_float("level_" .. tostring(currentLevel), "max_weight")
+    run_speed_delta    = level_system_config:r_float("level_" .. tostring(currentLevel), "run_speed")
+    sprint_speed_delta = level_system_config:r_float("level_" .. tostring(currentLevel), "sprint_speed")
+    health_regen_delta = level_system_config:r_float("level_" .. tostring(currentLevel), "health_regen")
+
+    -- Set new values. --
+    db.actor:set_actor_max_weight(current_max_weight + max_weight_delta)
+    db.actor:set_actor_run_coef(current_run_coef * run_speed_delta)
+    db.actor:set_actor_sprint_koef(current_sprint_coef * sprint_speed_delta)
+
     --bleed_restore_delta = 
 
     --db.actor:set_actor_max_weight(current_max_weight + max_weight_delta) -- This works
-    --db.actor:cast_Actor():conditions():BoostMaxWeight(max_weight_delta) -- This appears not to.
     --db.actor:set_actor_run_coef(current_run_coef + 10)
    -- db.actor.cast_Actor().conditions():BoostExplImmunity(1000)
     --db.actor:set_actor_sprint_koef(current_sprint_coef + sprint_speed_increase)
@@ -217,71 +240,6 @@ function LevelUpMessage()
 
 end
 
---This array attempts to figure out what the player's current bonus stats are from level ups.
---[[
-function FindPlayerStats()
-
-    local i = 1
-    local player_stats = {
-
-        --player_stats["max_weight"] = db.actor:get_actor_max_weight();
-        --player_stats["run_speed"] = db.actor:get_actor_run_coef();
-        --player_stats["sprint_speed"] = db.actor:get_actor_sprint_koef();
-        --player_stats["chem_protection"] = 
-
-    }
-
-    local stat_gains_per_level = {}
-
-    --[[
-    while (i <= maxLevel) do
-        player_stats[i] = level_system_config:r_float(tostring(i))
-        i = i + 1
-    end
-    ]]
-
-    --[[
-
-    player_stats = {
-
-        1,
-        2,
-        3,
-
-    }
-
-    ]]
-
-    --local player_stats = {}
-    --[[
-    --Get base stats and put them into chart.
-    player_stats.max_weight = db.actor:get_actor_max_weight()
-    player_stats.run_speed = db.actor:get_actor_run_coef();
-    player_stats.sprint_speed = 
-    player_stats.bleed_restore =
-    player_stats.health_regen =
-    player_stats.burn_immunity =
-    player_stats.chemical_burn_protection =
-    player_stats.chemical_burn_immunity =
-    player_stats.explosion_immunity =
-    player_stats.fire_wound_immunity =
-    player_stats.radiation_protection =
-    player_stats.radiation_immunity =
-    player_stats.shock_immunity =
-    player_stats.strike_immunity =
-    player_stats.telepatic_protection =
-    player_stats.telepatic_immunity =
-    player_stats.wound_immunity =
-    
-
-    --local player_stat_gains = {}
-
-    --player_stat_gains.max_weight =
-    ---. . . 
-
---end
-]]
-
 -- DETERMINE DIFFICULTY LEVEL --
 --This function is needed because it seems to be the only easy way to find the current save's actor's base stats.
 function CheckBaseImmunities()
@@ -296,5 +254,18 @@ end
 --Determines what the player's immunity boosts should be based on their level.
 function CheckTotalBoosts()
 
+    local total_stat_values = {}
+
+    --total_stat_values.max_weight = --Base max weight + added max weight
 
 end
+
+-- PRINT ALL STAT VALUES - DEBUG ONLY --
+function CheckStatValues()
+
+    printf("Run coef: " .. db.actor:get_actor_run_coef())
+    printf("Sprint koef: " .. db.actor:get_actor_sprint_koef())
+
+end
+
+
