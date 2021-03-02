@@ -41,7 +41,7 @@ Copyright Info/Legal Stuff
 NOTICE: This addon is in very early stages of development. Most planned features are not yet implemented.
         Please keep this in mind when using this addon.
 
-This addon adds a leveling system to S.T.A.L.K.E.R. Anomaly. Currently it is very rudimentary; however, I intend to make
+This addon adds a leveling system to S.T.A.L.K.E.R. Anomaly. Currently it is very rudimentary; however, I to make
 it much more in-depth in the coming months.
 
 In its current state, when the player kills NPCs or mutants in the Zone they gain experience points. After gaining a
@@ -50,6 +50,13 @@ certain amount of these points the player will level-up, increasing their stats.
 The exact details can be found in:
 
     \gamedata\configs\levelmod\level_system.ltx
+
+================
+= KNOWN ISSUES =
+================
+
+    1. Max carry weight gains will reset if you mess with the max weight slider in the difficulty options.
+    2.
 
 
 ==================

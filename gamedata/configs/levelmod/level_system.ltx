@@ -33,8 +33,8 @@
 [config_parameters]
 max_level                   = 10      ; Sets max level that can be attained. (Default: 10)
 restore_health              = false   ; Determines whether the player's health is restored on level up. (Default: false)
-show_current_exp            = "DIK_V" ; Currently unused.
-show_remaining_exp          = "DIK_B" ; Currently unused.
+level_on_sleep_only         = false   ; Currently unused. Will be implemented later on.
+show_current_exp            = "DIK_V" ; Currently unused. It's hardcoded currently.
 
 ;WARNING! DO NOT CHANGE THE VALUES FOR level_1. RISK OF INSTABILITY.
 [level_1]
@@ -64,7 +64,7 @@ max_weight                  = 0.25
 run_speed                   = 1.005
 sprint_speed                = 1.005
 bleed_restore               = 0
-health_regen                = 0
+health_regen                = 0.00005
 burn_immunity 				= 0
 chemical_burn_protection    = 0
 chemical_burn_immunity 		= 0

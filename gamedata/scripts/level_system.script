@@ -28,6 +28,8 @@ local currentExp = 0;                       -- The player's current quantity of 
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
 local level_thresholds = {};                -- Array that holds the required experience to hit each level.
 local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
+local current_health_regen = 0
+local total_stat_gains = {}
 
 -- INITIALIZATION --
 function on_game_start()
@@ -76,7 +78,7 @@ end
 -- KEY PRESS FUNCTIONS --
 function on_key_press(key)
 
-    -- These setup the ability to modify the key presses from the config file. TODO Unused
+    --These setup the ability to modify the key presses from the config file. TODO Unused
     --local show_current_exp = level_system_config:r_string("config_parameters","show_current_exp")
     --local show_remaining_exp = level_system_config:r_string("config_parameters","show_remaining_exp")
 
@@ -94,8 +96,10 @@ function on_key_press(key)
     end
 
     -- Debug key to print various values to console.
-    if (key == DIK_keys["DIK_]"] ) then
-        CheckStatValues()
+    if (key == DIK_keys["DIK_B"] ) then
+        --CheckStatValues()
+        SetupTotalStatGains()
+        printf(total_stat_gains["max_weight"])
     end
 
 end
@@ -117,8 +121,8 @@ end
 -- GAME UPDATE LOOP --
 function actor_on_update()
 
-    CheckForLevelUp() -- Checks to see if the player has gained enough experience to level up every update. May change to sleep only.
-
+    CheckForLevelUp()  --Checks to see if the player has gained enough experience to level up every update. May change to sleep only.
+    --RegenerateHealth() --Can't use. See function comment. Was non optimal anyway.
 end
 
 -- LEVEL UP FUNCTION --
@@ -135,17 +139,17 @@ function CheckForLevelUp()
                 currentExp = 0
             end
 
-            LevelUp(currentLevel);
+            LevelUp();
 
         else end
 
 end
 
 -- GRANT BONUSES ON LEVEL UP --
-function LevelUp(level)
+function LevelUp()
 
     printdbg("Beginning player level up sequence.")
-    --GainStats()
+    GainStats()
     --GainImmunities()
     LevelUpMessage() -- Shows message when player levels up.
     printdbg("Level up sequence completed successfully.")
@@ -172,7 +176,6 @@ function GainStats()
     local current_max_weight = db.actor:get_actor_max_weight()       -- Get player's max carry weight.
     local current_run_coef = db.actor:get_actor_run_coef()           -- Get player's run speed factor.
     local current_sprint_coef = db.actor:get_actor_sprint_koef()     -- Get player's sprint speed factor.
-    --local current_health_regen                                       -- TODO Might need to be initialized in the global scope.
 
     --STAT CHANGE VARIABLES--
     --Determines how much the applicable stat increases These are pulled from level_system_config.ltx
@@ -185,12 +188,14 @@ function GainStats()
     db.actor:set_actor_max_weight(current_max_weight + max_weight_delta)        -- Increase max carry weight.
     db.actor:set_actor_run_coef(current_run_coef * run_speed_delta)             -- Multiply run speed.
     db.actor:set_actor_sprint_koef(current_sprint_coef * sprint_speed_delta)    -- Multiply spring speed.
-    --db.actor.cast_Actor().conditions().BoostHpRestore(current_health_regen + health_regen_delta) = current_health_regen
     
-
+    -- Check if player gains any regeneration.
+    if (health_regen_delta > 0) then
+        current_health_regen = health_regen_delta + current_health_regen
+    end
+    
    -- db.actor.cast_Actor().conditions():BoostExplImmunity(1000)
     --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
-    --db.actor:set_actor_jump_speed(current_jump_speed + 1000)
 
 end
 
@@ -244,7 +249,7 @@ function LevelThresholdsSetup()
 end
 
 -- SHOW NOTIFICATION UPON LEVEL UP -- 
-function LevelUpMessage() 
+function LevelUpMessage()
     
     actor_menu.set_fade_msg("Leveled up to Level " .. currentLevel, 5, nil, "device\\pda\\spot_discovered")
 
@@ -261,23 +266,57 @@ function CheckBaseImmunities()
 
 end
 
---Determines what the player's immunity boosts should be based on their level.
-function CheckTotalBoosts()
-
-    local total_stat_values = {}
-
-    --total_stat_values.max_weight = --Base max weight + added max weight
-
-end
-
 -- PRINT ALL STAT VALUES - DEBUG ONLY --
 function CheckStatValues()
 
     printf("Max weight: " .. db.actor:get_actor_max_weight())
     printf("Run coef: " .. db.actor:get_actor_run_coef())
     printf("Sprint koef: " .. db.actor:get_actor_sprint_koef())
-    -- TODO printf("Health Regen: ")
+    printf("Health regen: " .. current_health_regen)
+
+end
+
+-- REGENERATE PLAYER HP OVER TIME --
+-- This doesn't work because actor_on_update is tied directly to framerate. Potato PCs won't get the proper regen.
+--[[
+function RegenerateHealth()
+
+    if (current_health_regen > 0) then
+        db.actor:change_health(current_health_regen)
+    end
+
+end
+]]
+
+--This needs to be done in case the player messes with the difficulty sliders in game.
+--Check if player messed with difficulty bar then invoke this function.
+function SetupTotalStatGains()
+
+    --TODO: ADD ALL NECESSARY STATS HERE
+    total_stat_gains["max_weight"]      = AddUpGains("max_weight"),
+    total_stat_gains["run_speed"]       = AddUpGains("run_speed"),
+    total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
+    total_stat_gains["bleed_restore"]   = AddUpGains("bleed_restore"),
+    total_stat_gains["health_regen"]    = AddUpGains("health_regen"),
+    --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
+    --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
+    --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
 
 end
 
 
+--Iterates through all stat gains the player should have accumulated by their current level.
+--Invoked by SetupTotalStatGains()
+function AddUpGains(stat)
+
+    local i = 1
+    local totalGains = 0
+    
+    while (i <= currentLevel) do
+        totalGains = totalGains + level_system_config:r_float("level_" .. tostring(i), stat)
+        i = i + 1
+    end
+
+    return totalGains
+
+end
