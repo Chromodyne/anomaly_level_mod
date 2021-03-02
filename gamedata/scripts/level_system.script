@@ -53,7 +53,6 @@ function save_state(m_data)
         local save_data = {}
         save_data.currentLevel = currentLevel or 1
         save_data.currentExp = currentExp or 0
-        --save_data.currentStats = nil
 
         m_data.save_data = save_data
 
@@ -70,6 +69,7 @@ function load_state(m_data)
     if save_data then
         currentLevel = save_data.currentLevel or 1
         currentExp = save_data.currentExp or 0
+        SetupTotalStatGains()
         printf("Save data loaded correctly. LVLSYS")
     end
 
@@ -98,7 +98,7 @@ function on_key_press(key)
     -- Debug key to print various values to console.
     if (key == DIK_keys["DIK_B"] ) then
         --CheckStatValues()
-        SetupTotalStatGains()
+        --SetupTotalStatGains()
         printf(total_stat_gains["max_weight"])
     end
 
@@ -119,6 +119,7 @@ function monster_on_death_callback(victim, killer)
 end
 
 -- GAME UPDATE LOOP --
+-- Framerate dependent. Do not use for anything critical.
 function actor_on_update()
 
     CheckForLevelUp()  --Checks to see if the player has gained enough experience to level up every update. May change to sleep only.
@@ -288,26 +289,24 @@ function RegenerateHealth()
 end
 ]]
 
---This needs to be done in case the player messes with the difficulty sliders in game.
---Check if player messed with difficulty bar then invoke this function.
+--This needs to be done in case the player messes with the difficulty sliders in game. Audits data and allows it to save.
+--TODO: Check if player messed with relevant difficulty sliders then invoke this function.
 function SetupTotalStatGains()
 
     --TODO: ADD ALL NECESSARY STATS HERE
-    total_stat_gains["max_weight"]      = AddUpGains("max_weight"),
-    total_stat_gains["run_speed"]       = AddUpGains("run_speed"),
-    total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
-    total_stat_gains["bleed_restore"]   = AddUpGains("bleed_restore"),
-    total_stat_gains["health_regen"]    = AddUpGains("health_regen"),
+    total_stat_gains["max_weight"]      = AddUpGains("max_weight")
+    --total_stat_gains["run_speed"]       = AddUpGains("run_speed"),
+    --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
+    --total_stat_gains["bleed_restore"]   = AddUpGains("bleed_restore"),
+    --total_stat_gains["health_regen"]    = AddUpGains("health_regen")
     --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
     --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
     --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
 
 end
 
-
---Iterates through all stat gains the player should have accumulated by their current level.
---Invoked by SetupTotalStatGains()
-function AddUpGains(stat)
+--Iterates through all stat gains the player should have accumulated by their current level. Good for saving data/auditing data.
+function AddUpGains(stat) --Invoked by SetupTotalStatGains()
 
     local i = 1
     local totalGains = 0
