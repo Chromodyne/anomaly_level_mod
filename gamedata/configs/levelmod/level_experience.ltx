@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;                              ;
 ;   Experience Values Config   ;
-;                              ;
+;         Version: 0.01        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;NOTE: Nothing in this config is currently used. Experience values are currently constants in the code
@@ -11,8 +11,17 @@
 
 ;All default values are currently placeholder. Balancing needs to be done to determine reasonable defaults.
 ; MUTANTS / MONSTERS
+[monsters]
+dog         =
+flesh       =
+pseudodog   =
+snork       =
+bloodsucker =
+lurker      =
+chimera     =
+
 [dog]
-exp_value = 30
+exp_value = 25
 [flesh]
 exp_value = 50
 [snork]
@@ -25,7 +34,7 @@ exp_value = 500
 exp_value = 1000
 
 
-;NPCs
+;NPCs - THIS SECTION IS CURRENTLY UNUSED. ALL NPCs grant the same amount of experience.
 ;TODO Change these to take in various other conditions. i.e. NPC gear, relative strength, rank, etc.
 [bandit]
 exp_value = 75

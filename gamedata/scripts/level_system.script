@@ -19,17 +19,18 @@ TODO
 
 -- FILE LINKS --
 --Links necessary configuration files to this script.
-local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the configuration (ltx) file to this script.
---local exp_gains_config  = ini_file("levelmod\\level_experience.ltx") -- Links the experience value config to this script.
+local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the primary config file to this script.
+local exp_gains_config  = ini_file("levelmod\\level_experience.ltx")   -- Links the experience value config to this script.
 
 
 -- CONFIGURATION VARIABLES/ARRAYS --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
 local level_thresholds = {};                -- Array that holds the required experience to hit each level.
-local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
 local current_health_regen = 0
 local total_stat_gains = {}
+local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
+local level_on_sleep = level_system_config:r_bool("config_parameters", "level_on_sleep_only") -- TODO. Currently not used.
 
 -- INITIALIZATION --
 function on_game_start()
@@ -58,7 +59,7 @@ function save_state(m_data)
 
     end
 
-    printf("Data saved correctly. LVLSYS")
+    printdbg("Data saved correctly. LVLSYS")
 
 end
 
@@ -69,8 +70,8 @@ function load_state(m_data)
     if save_data then
         currentLevel = save_data.currentLevel or 1
         currentExp = save_data.currentExp or 0
-        SetupTotalStatGains()
-        printf("Save data loaded correctly. LVLSYS")
+        SetupTotalStatGains() -- Called to check and audit what bonuses the player's current level should have.
+        printdbg("Save data loaded correctly. LVLSYS")
     end
 
 end
@@ -83,7 +84,6 @@ function on_key_press(key)
     --local show_remaining_exp = level_system_config:r_string("config_parameters","show_remaining_exp")
 
     local remaining_exp = level_thresholds[currentLevel + 1] - currentExp -- Determines exp to level.
-    -- local debug_gain_exp = . . .
 
     if (key == DIK_keys["DIK_C"] ) then -- Grant 500exp when 'C' is pressed. DEBUG ONLY
         currentExp = currentExp + 500
@@ -97,9 +97,9 @@ function on_key_press(key)
 
     -- Debug key to print various values to console.
     if (key == DIK_keys["DIK_B"] ) then
-        --CheckStatValues()
+        CheckStatValues()
         --SetupTotalStatGains()
-        printf(total_stat_gains["max_weight"])
+        --printf(total_stat_gains["max_weight"])
     end
 
 end
@@ -107,14 +107,14 @@ end
 -- EXPERIENCE GAIN ON NPC DEATH --
 function npc_on_death_callback(victim, killer)
 
-    CheckKiller(killer)
+    CheckKiller(victim, killer)
 
 end
 
 -- EXPERIENCE GAIN ON MONSTER DEATH --
 function monster_on_death_callback(victim, killer)
 
-    CheckKiller(killer)
+    CheckKiller(victim, killer)
 
 end
 
@@ -212,18 +212,23 @@ function GainImmunities()
 end
 
 -- CHECK KILLER ON MOB/NPC DEATH -- 
-function CheckKiller(killer)
+function CheckKiller(victim, killer)
 
-    local id = killer:id()
+    local killer_id = killer:id()
+    local victim_id = victim:id()
 
-    if (id == AC_ID) then -- Determines if the killer was the player or not. If not, experience is not gained.
-        GrantExperience()
+    if (killer_id == AC_ID) then -- Determines if the killer was the player or not. If not, experience is not gained.
+       
+        GainExperience(victim_id) -- TODO Change this to now check the victim id to reference the exp table in the second config.
+
     end
 
 end
 
 -- GRANT PLAYER EXPERIENCE --
-function GrantExperience()
+function GainExperience(victim_id)
+
+    local id = victim_id
 
     currentExp = currentExp + 500
     printf(currentExp)
@@ -268,8 +273,9 @@ function CheckBaseImmunities()
 end
 
 -- PRINT ALL STAT VALUES - DEBUG ONLY --
-function CheckStatValues()
+function CheckStatValuesDebug()
 
+    -- Prints out relevant accessible stats for debug purposes.
     printf("Max weight: " .. db.actor:get_actor_max_weight())
     printf("Run coef: " .. db.actor:get_actor_run_coef())
     printf("Sprint koef: " .. db.actor:get_actor_sprint_koef())
@@ -278,7 +284,7 @@ function CheckStatValues()
 end
 
 -- REGENERATE PLAYER HP OVER TIME --
--- This doesn't work because actor_on_update is tied directly to framerate. Potato PCs won't get the proper regen.
+-- This needs to be reworked to be framerate independent. Originally was called on_actor_update which is framerate dependent.
 --[[
 function RegenerateHealth()
 
