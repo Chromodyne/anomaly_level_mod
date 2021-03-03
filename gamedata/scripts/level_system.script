@@ -215,7 +215,7 @@ end
 function CheckKiller(victim, killer)
 
     local killer_id = killer:id()
-    local victim_id = victim:id()
+    local victim_id = victim:clsid()
 
     if (killer_id == AC_ID) then -- Determines if the killer was the player or not. If not, experience is not gained.
        
@@ -228,11 +228,10 @@ end
 -- GRANT PLAYER EXPERIENCE --
 function GainExperience(victim_id)
 
-    local id = victim_id
-
-    currentExp = currentExp + 500
-    printf(currentExp)
-
+    local id = victim_id -- The victim id is unique; therefore, it doesn't link to specific mutant class. 
+    local exp_gained = DetermineMonster(id)
+    
+    currentExp = currentExp + exp_gained
 end
 
 -- PARSE CONFIGURATION FILE --
@@ -325,3 +324,151 @@ function AddUpGains(stat) --Invoked by SetupTotalStatGains()
     return totalGains
 
 end
+
+-- REMOVE ME LATER, FOR PROTOTYPING --
+-- This will be used to determine which exp value to use from the config file based on the victimid passed in.
+-- TODO : Simplify this and make it less shit. It works but I don't like it.
+function DetermineMonster(id)
+
+    local m_id = id
+    local monster
+    local exp_value
+
+    local monster_lookup_table = {
+
+        [1]             = clsid.bloodsucker_s,
+		[2]             = clsid.boar_s,			
+		[3]             = clsid.dog_s,					
+		[4]             = clsid.flesh_s,				
+		[5]             = clsid.pseudodog_s,			
+		[6]             = clsid.burer_s,	
+		[7]             = clsid.cat_s,				
+		[8]             = clsid.rat,				
+		[9]             = clsid.rat_s,				
+		[10]            = clsid.chimera_s,			
+		[11]            = clsid.controller_s,		
+		[12]            = clsid.fracture_s,	
+		[13]            = clsid.poltergeist_s,		
+		[14]            = clsid.gigant_s,			
+		[15]            = clsid.zombie_s,				
+		[16]            = clsid.snork_s,				
+		[17]            = clsid.tushkano_s,			
+		[18]            = clsid.psy_dog_s,		
+		[19]            = clsid.psy_dog_phantom_s		
+        
+    }
+
+    local monster_name = {
+
+        "bloodsucker",
+        "boar",
+        "dog",
+        "flesh",
+        "pseudodog",
+        "burer",
+        "cat",
+        "rat",
+        "rat2",
+        "chimera",
+        "controller",
+        "fracture",
+        "poltergeist",
+        "gigant",
+        "zombie",
+        "snork",
+        "tushkano",
+        "psy_dog",
+        "psy_dog_phantom"
+
+    }
+
+    local i = 1
+    local num_monsters = 19 -- Don't like having this hardcoded but it's a lot more efficient than iterating through a table
+
+    -- DID NOT want to do it this way. I'll figure out a better way later. Need a switch statement analogue
+    while (i <= num_monsters ) do
+        if (m_id == monster_lookup_table[i]) then
+            monster = monster_name[i]
+            exp_value = exp_gains_config:r_float(monster_name[i],"exp_value")
+            break
+        else 
+            i = i + 1
+        end
+    end
+
+    return exp_value
+
+end
+
+-- Might need later.
+--[[
+
+        ["bloodsucker"]       = clsid.bloodsucker_s,
+		["boar"]              = clsid.boar_s,			
+		["dog"]               = clsid.dog_s,					
+		["flesh"]             = clsid.flesh_s,				
+		["pseudodog"]         = clsid.pseudodog_s,			
+		["burer"]             = clsid.burer_s,	
+		["cat"]               = clsid.cat_s,				
+		["rat"]               = clsid.rat,				
+		["rat2"]              = clsid.rat_s,				
+		["chimera"]           = clsid.chimera_s,			
+		["controller"]        = clsid.controller_s,		
+		["fracture"]          = clsid.fracture_s,	
+		["poltergeist"]       = clsid.poltergeist_s,		
+		["gigant"]            = clsid.gigant_s,			
+		["zombie"]            = clsid.zombie_s,				
+		["snork"]             = clsid.snork_s,				
+		["tushkano"]          = clsid.tushkano_s,			
+		["psy_dog"]           = clsid.psy_dog_s,		
+		["psy_dog_phantom"]   = clsid.psy_dog_phantom_s		
+
+        local monster_lookup_table = {
+
+        [1]             = clsid.bloodsucker_s,
+		[2]             = clsid.boar_s,			
+		[3]             = clsid.dog_s,					
+		[4]             = clsid.flesh_s,				
+		[5]             = clsid.pseudodog_s,			
+		[6]             = clsid.burer_s,	
+		[7]             = clsid.cat_s,				
+		[8]             = clsid.rat,				
+		[9]             = clsid.rat_s,				
+		[10]            = clsid.chimera_s,			
+		[11]            = clsid.controller_s,		
+		[12]            = clsid.fracture_s,	
+		[13]            = clsid.poltergeist_s,		
+		[14]            = clsid.gigant_s,			
+		[15]            = clsid.zombie_s,				
+		[16]            = clsid.snork_s,				
+		[17]            = clsid.tushkano_s,			
+		[18]            = clsid.psy_dog_s,		
+		[19]            = clsid.psy_dog_phantom_s		
+        
+    }
+
+        local monster_lookup_table = {
+--     Index   - - - - -      Class ID   -----      Name -----       
+        [1]             = {clsid.bloodsucker_s, "bloodsucker"},
+		[2]             = {clsid.boar_s, "boar"},			
+		[3]             = {clsid.dog_s, "dog"},		
+		[4]             = {clsid.flesh_s, "flesh"},				
+		[5]             = {clsid.pseudodog_s, "pseudodog"},			
+		[6]             = {clsid.burer_s, "burer"},	
+		[7]             = {clsid.cat_s, "cat"},				
+		[8]             = {clsid.rat, "rat"},				
+		[9]             = {clsid.rat_s, "rat2"},				
+		[10]            = {clsid.chimera_s, "chimera"},			
+		[11]            = {clsid.controller_s, "controller"},		
+		[12]            = {clsid.fracture_s, "fracture"},	
+		[13]            = {clsid.poltergeist_s,	"poltergeist"},	
+		[14]            = {clsid.gigant_s, "gigant"},			
+		[15]            = {clsid.zombie_s, "zombie"},				
+		[16]            = {clsid.snork_s, "snork"},				
+		[17]            = {clsid.tushkano_s, "tushkano"}, 			
+		[18]            = {clsid.psy_dog_s, "psy_dog"},
+		[19]            = {clsid.psy_dog_phantom_s, "psy_dog_phantom"}		
+        
+    }
+
+    ]]
