@@ -104,16 +104,20 @@ function on_key_press(key)
 
 end
 
--- EXPERIENCE GAIN ON NPC DEATH --
-function npc_on_death_callback(victim, killer)
-
-    CheckKiller(victim, killer)
-
-end
-
 -- EXPERIENCE GAIN ON MONSTER DEATH --
 function monster_on_death_callback(victim, killer)
 
+    local caller = 1  -- This id tells the GainExperience function whether it was a monster or an NPC that died.
+
+    CheckKiller(victim, killer, caller)
+
+end
+
+-- EXPERIENCE GAIN ON NPC DEATH --
+function npc_on_death_callback(victim, killer)
+
+    local caller = 2 -- This id tells the GainExperience function whether it was a monster or an NPC that died.
+    
     CheckKiller(victim, killer)
 
 end
@@ -212,24 +216,35 @@ function GainImmunities()
 end
 
 -- CHECK KILLER ON MOB/NPC DEATH -- 
-function CheckKiller(victim, killer)
+function CheckKiller(victim, killer, caller)
 
     local killer_id = killer:id()
-    local victim_id = victim:clsid()
+    local victim_id = victim:clsid() -- This gives the victim's classid. Good for determining specific mutants that were killed.
 
     if (killer_id == AC_ID) then -- Determines if the killer was the player or not. If not, experience is not gained.
-       
-        GainExperience(victim_id) -- TODO Change this to now check the victim id to reference the exp table in the second config.
-
+       GainExperience(victim_id, caller)
+    else
+        return
     end
 
 end
 
 -- GRANT PLAYER EXPERIENCE --
-function GainExperience(victim_id)
+function GainExperience(victim_id, caller)
 
     local id = victim_id -- The victim id is unique; therefore, it doesn't link to specific mutant class. 
-    local exp_gained = DetermineMonster(id)
+    local type_id = caller  -- This is passed along from the previous two functions to determine if the entity killed was a monster or an npc.
+    local exp_gained    -- Stores how much exp should be gained on kill.
+
+    if (type_id == 1) then
+
+        exp_gained = DetermineMonster(id)
+
+    elseif (type_id == 2) then
+
+        exp_gained = 0 -- TODO: For testing purposes until I find out if the above works. ***
+
+    end
     
     currentExp = currentExp + exp_gained
 end
@@ -378,6 +393,11 @@ function DetermineMonster(id)
 
 end
 
+--[[
+function DetermineNpc()
+
+end
+]]
 -- Old shitty stuff i did/tried. Leaving here for posterity. Well... for now.
 --[[
         local monster_lookup_table = {
