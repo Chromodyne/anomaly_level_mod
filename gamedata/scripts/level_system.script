@@ -359,10 +359,11 @@ function DetermineMonster(id)
             }
 
     local i = 1
-    local num_monsters = 19 -- Don't like having this hardcoded but it's a lot more efficient than iterating through a table
+    local num_monsters = 19 -- Don't like having this hardcoded but it's a lot more efficient than iterating through a table to determine the numebr every time.
 
     -- DID NOT want to do it this way. I'll figure out a better way later. Need a switch statement analogue
     while (i <= num_monsters ) do
+
         if (m_id == monster_lookup_table[i][1]) then
             monster = monster_lookup_table[i][2]
             exp_value = exp_gains_config:r_float(monster,"exp_value")
@@ -370,6 +371,7 @@ function DetermineMonster(id)
         else 
             i = i + 1
         end
+
     end
 
     return exp_value
