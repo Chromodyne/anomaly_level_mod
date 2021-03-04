@@ -1,46 +1,38 @@
 --[[
-Zone Progression Mod
+Zone Experience Project
 
 Created By: Chromodyne
 Version: 0.01a (Alpha Build - Not for distribution.)
 Created: 02/25/21
-Updated: 03/01/21
+Updated: 03/03/21
 
-Notes: Currently this addon only creates a rudimentary level and experience system for the player. Right now it only gives 'general' exp but I want to eventually make it able to have different skills to level up. 
-I also eventually hope to make it able to account for NPCs gaining experience as well but time will tell if that's feasible. 
-
-TODO
-1. Figure out this damn config file bullshit.
-2. Make sure everything remains after saving.
-3. Vary experience by faction
+Notes: Currently this addon only creates a rudimentary level and experience system for the player. Right now it only gives 'general' exp but eventually it will be 
+able to have different skills to level up. 
 
 ]]--
 
-
 -- FILE LINKS --
---Links necessary configuration files to this script.
 local level_system_config = ini_file("levelmod\\level_system.ltx")     -- Links the primary config file to this script.
 local exp_gains_config  = ini_file("levelmod\\level_experience.ltx")   -- Links the experience value config to this script.
-
 
 -- CONFIGURATION VARIABLES/ARRAYS --
 local currentExp = 0;                       -- The player's current quantity of experience.
 local currentLevel = 1;                     -- The player's current level. Must ALWAYS be >= 1 or bugs/crashes will occur.
 local level_thresholds = {};                -- Array that holds the required experience to hit each level.
-local current_health_regen = 0
+local current_health_regen = 0 -- Currently not used. TODO
 local total_stat_gains = {}
 local maxLevel = level_system_config:r_float("config_parameters", "max_level");  -- Determines the max general level for the player.
-local level_on_sleep = level_system_config:r_bool("config_parameters", "level_on_sleep_only") -- TODO. Currently not used.
+local level_on_sleep = level_system_config:r_bool("config_parameters", "level_on_sleep_only") -- Boolean to check if player wants level up on sleep. NOT USED CURRENTLY
 
 -- INITIALIZATION --
 function on_game_start()
 
     RegisterScriptCallback("on_key_press", on_key_press)                            -- Connected to whenever 
     RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)          -- Connected to whenever NPCs die.
-    RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)   -- Connected to whenever monsters/mutants die.
-    RegisterScriptCallback("actor_on_update", actor_on_update) -- Connected to whenever the player updates. Good for looping.
-    RegisterScriptCallback("save_state", save_state) -- Callback for saving data to disk via alife_storage_manager.
-    RegisterScriptCallback("load_state", load_state) -- Callback for reloading data from disk via alife_storage manager.
+    RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)  -- Connected to whenever monsters/mutants die.
+    RegisterScriptCallback("actor_on_update", actor_on_update)                      -- Connected to whenever the player updates. Good for looping.
+    RegisterScriptCallback("save_state", save_state)                                -- Callback for saving data to disk via alife_storage_manager.
+    RegisterScriptCallback("load_state", load_state)                                -- Callback for reloading data from disk via alife_storage manager.
     CheckBaseImmunities()
     ParseConfig()
 
@@ -70,7 +62,7 @@ function load_state(m_data)
     if save_data then
         currentLevel = save_data.currentLevel or 1
         currentExp = save_data.currentExp or 0
-        SetupTotalStatGains() -- Called to check and audit what bonuses the player's current level should have.
+        --SetupTotalStatGains() -- Called to check and audit what bonuses the player's current level should have.
         printdbg("Save data loaded correctly. LVLSYS")
     end
 
@@ -104,7 +96,7 @@ function on_key_press(key)
 
 end
 
--- EXPERIENCE GAIN ON MONSTER DEATH --
+-- CALL ON MONSTER DEATH --
 function monster_on_death_callback(victim, killer)
 
     local caller = 1  -- This id tells the GainExperience function whether it was a monster or an NPC that died.
@@ -113,7 +105,7 @@ function monster_on_death_callback(victim, killer)
 
 end
 
--- EXPERIENCE GAIN ON NPC DEATH --
+-- CALL ON NPC DEATH --  (Used most for exp gain.)
 function npc_on_death_callback(victim, killer)
 
     local caller = 2 -- This id tells the GainExperience function whether it was a monster or an NPC that died.
@@ -122,8 +114,7 @@ function npc_on_death_callback(victim, killer)
 
 end
 
--- GAME UPDATE LOOP --
--- Framerate dependent. Do not use for anything critical.
+-- GAME UPDATE LOOP -- Framerate dependent. Do not use for anything critical.
 function actor_on_update()
 
     CheckForLevelUp()  --Checks to see if the player has gained enough experience to level up every update. May change to sleep only.
@@ -154,9 +145,19 @@ end
 function LevelUp()
 
     printdbg("Beginning player level up sequence.")
+
+    -- RESTORE PLAYER HEALTH (If enabled in config.) --
+    local restore_health = level_system_config:r_bool("config_parameters", "restore_health")
+    if (restore_health == true) then
+        db.actor:change_health(100)
+    else end
+
     GainStats()
-    --GainImmunities()
+
+    GainImmunities()
+
     LevelUpMessage() -- Shows message when player levels up.
+
     printdbg("Level up sequence completed successfully.")
 
     return
@@ -170,12 +171,6 @@ function GainStats()
     --Currently the percentage gains are skewed as they are based off current instead of base. --
     --local base_run_coef = 2.41
     --local base_sprint_koef = 2.08
-
-    -- RESTORE PLAYER HEALTH (If enabled in config.) --
-    local restore_health = level_system_config:r_bool("config_parameters", "restore_health")
-    if (restore_health == true) then
-        db.actor:change_health(100)
-    else end
 
     --CURRENT STAT VARIABLES--
     local current_max_weight = db.actor:get_actor_max_weight()       -- Get player's max carry weight.
@@ -195,23 +190,55 @@ function GainStats()
     db.actor:set_actor_sprint_koef(current_sprint_coef * sprint_speed_delta)    -- Multiply spring speed.
     
     -- Check if player gains any regeneration.
+    -- TODO: Needs to be implemented later.
     if (health_regen_delta > 0) then
         current_health_regen = health_regen_delta + current_health_regen
     end
     
-   -- db.actor.cast_Actor().conditions():BoostExplImmunity(1000)
     --db.actor:max_health() = db.actor:max_health() + increaseHealth // max_health is a const so I need to find another way...
 
 end
 
 -- INCREASE PLAYER IMMUNITIES & RESISTANCES --
--- TODO : implement this!
 function GainImmunities()
 
-    --db.actor:cast_Actor():conditions():BoostExplImmunity(50)
-    --db.actor:cast_Actor():conditions():BoostBurnImmunity(gain_burn_immunity)
-    --db.actor:cast_Actor():conditions():BoostRadiationProtection(gain_radiation_protection)
-    --db.actor:cast_Actor():conditions():BoostRadiationImmunity(10)
+    local actor = db.actor:cast_Actor():conditions() -- Saves me a bit of typing.
+
+    local immunity_table =  {
+    
+        ---            Name     ---          |          ---                 Reference             ---     |
+      [1]     = { "burn_immunity",                level_system_config:r_float("level_" .. tostring(currentLevel) , "burn_immunity") },
+      [2]     = { "chemical_burn_protection",     level_system_config:r_float("level_" .. tostring(currentLevel) , "chemical_burn_protection") },
+      [3]     = { "chemical_burn_immunity",       level_system_config:r_float("level_" .. tostring(currentLevel) , "chemical_burn_immunity") },
+      [4]     = { "explosion_immunity",           level_system_config:r_float("level_" .. tostring(currentLevel) , "explosion_immunity") },
+      [5]     = { "fire_wound_immunity",          level_system_config:r_float("level_" .. tostring(currentLevel) , "fire_wound_immunity") },
+      [6]     = { "radiation_protection",         level_system_config:r_float("level_" .. tostring(currentLevel) , "radiation_protection") },
+      [7]     = { "radiation_immunity",           level_system_config:r_float("level_" .. tostring(currentLevel) , "radiation_immunity") },
+      [8]     = { "shock_immunity",               level_system_config:r_float("level_" .. tostring(currentLevel) , "shock_immunity") },
+      [9]     = { "strike_immunity",              level_system_config:r_float("level_" .. tostring(currentLevel) , "strike_immunity") },
+      [10]    = { "telepatic_protection",         level_system_config:r_float("level_" .. tostring(currentLevel) , "telepatic_protection") },
+      [11]    = { "telepatic_immunity",           level_system_config:r_float("level_" .. tostring(currentLevel) , "telepatic_immunity") },
+      [12]    = { "wound_immunity",               level_system_config:r_float("level_" .. tostring(currentLevel) , "wound_immunity") }
+      
+    }
+
+    actor:BoostBurnImmunity(immunity_table[1][2])
+    actor:BoostChemicalBurnProtection(immunity_table[2][2])
+    actor:BoostChemicalBurnImmunity(immunity_table[3][2])
+    actor:BoostExplImmunity(immunity_table[4][2])
+    actor:BoostFireWoundImmunity(immunity_table[5][2])
+    actor:BoostRadiationProtection(immunity_table[6][2])
+    actor:BoostRadiationImmunity(immunity_table[7][2])
+    actor:BoostShockImmunity(immunity_table[8][2])
+    actor:BoostStrikeImmunity(immunity_table[9][2])
+    actor:BoostTelepaticProtection(immunity_table[10][2])
+    actor:BoostTelepaticImmunity(immunity_table[11][2])
+    actor:BoostWoundImmunity(immunity_table[12][2])
+
+    --printf(immunity_table[1][2]) -- REMOVE AFTER DEBUG
+    printf("Immunities successfully boosted.")
+
+    return
 
 end
 
@@ -297,20 +324,7 @@ function CheckStatValuesDebug()
 
 end
 
--- REGENERATE PLAYER HP OVER TIME --
--- This needs to be reworked to be framerate independent. Originally was called on_actor_update which is framerate dependent.
 --[[
-function RegenerateHealth()
-
-    if (current_health_regen > 0) then
-        db.actor:change_health(current_health_regen)
-    end
-
-end
-]]
-
---This needs to be done in case the player messes with the difficulty sliders in game. Audits data and allows it to save.
---TODO: Check if player messed with relevant difficulty sliders then invoke this function.
 function SetupTotalStatGains()
 
     --TODO: ADD ALL NECESSARY STATS HERE
@@ -324,6 +338,7 @@ function SetupTotalStatGains()
     --total_stat_gains["sprint_speed"]    = AddUpGains("sprint_speed"),
 
 end
+]]
 
 --Iterates through all stat gains the player should have accumulated by their current level. Good for saving data/auditing data.
 function AddUpGains(stat) --Invoked by SetupTotalStatGains()
@@ -340,8 +355,8 @@ function AddUpGains(stat) --Invoked by SetupTotalStatGains()
 
 end
 
--- REMOVE ME LATER, FOR PROTOTYPING --
--- TODO: Make this less shit later.
+
+-- CHECK MONSTER KILLED / EXPERIENCE IT'S WORTH --
 function DetermineMonster(id)
 
     local m_id = id
@@ -393,82 +408,21 @@ function DetermineMonster(id)
 
 end
 
+-- REGENERATE PLAYER HP OVER TIME --
+-- This needs to be reworked to be framerate independent. Originally was called on_actor_update which is framerate dependent.
 --[[
-function DetermineNpc()
+function RegenerateHealth()
+
+    if (current_health_regen > 0) then
+        db.actor:change_health(current_health_regen)
+    end
 
 end
 ]]
--- Old shitty stuff i did/tried. Leaving here for posterity. Well... for now.
---[[
-        local monster_lookup_table = {
 
-        [1]             = clsid.bloodsucker_s,
-		[2]             = clsid.boar_s,			
-		[3]             = clsid.dog_s,					
-		[4]             = clsid.flesh_s,				
-		[5]             = clsid.pseudodog_s,			
-		[6]             = clsid.burer_s,	
-		[7]             = clsid.cat_s,				
-		[8]             = clsid.rat,				
-		[9]             = clsid.rat_s,				
-		[10]            = clsid.chimera_s,			
-		[11]            = clsid.controller_s,		
-		[12]            = clsid.fracture_s,	
-		[13]            = clsid.poltergeist_s,		
-		[14]            = clsid.gigant_s,			
-		[15]            = clsid.zombie_s,				
-		[16]            = clsid.snork_s,				
-		[17]            = clsid.tushkano_s,			
-		[18]            = clsid.psy_dog_s,		
-		[19]            = clsid.psy_dog_phantom_s		
-        
-    }
-    local monster_name = {
+--This needs to be done in case the player messes with the difficulty sliders in game. Audits data and allows it to save.
+--TODO: Check if player messed with relevant difficulty sliders then invoke this function.
 
-        "bloodsucker",
-        "boar",
-        "dog",
-        "flesh",
-        "pseudodog",
-        "burer",
-        "cat",
-        "rat",
-        "rat2",
-        "chimera",
-        "controller",
-        "fracture",
-        "poltergeist",
-        "gigant",
-        "zombie",
-        "snork",
-        "tushkano",
-        "psy_dog",
-        "psy_dog_phantom"
 
-    }
-
-        local monster_lookup_table = {
---     Index   - - - - -      Class ID   -----      Name -----       
-        [1]             = {clsid.bloodsucker_s, "bloodsucker"},
-		[2]             = {clsid.boar_s, "boar"},			
-		[3]             = {clsid.dog_s, "dog"},		
-		[4]             = {clsid.flesh_s, "flesh"},				
-		[5]             = {clsid.pseudodog_s, "pseudodog"},			
-		[6]             = {clsid.burer_s, "burer"},	
-		[7]             = {clsid.cat_s, "cat"},				
-		[8]             = {clsid.rat, "rat"},				
-		[9]             = {clsid.rat_s, "rat2"},				
-		[10]            = {clsid.chimera_s, "chimera"},			
-		[11]            = {clsid.controller_s, "controller"},		
-		[12]            = {clsid.fracture_s, "fracture"},	
-		[13]            = {clsid.poltergeist_s,	"poltergeist"},	
-		[14]            = {clsid.gigant_s, "gigant"},			
-		[15]            = {clsid.zombie_s, "zombie"},				
-		[16]            = {clsid.snork_s, "snork"},				
-		[17]            = {clsid.tushkano_s, "tushkano"}, 			
-		[18]            = {clsid.psy_dog_s, "psy_dog"},
-		[19]            = {clsid.psy_dog_phantom_s, "psy_dog_phantom"}		
-        
-    }
-
-    ]]
+--function DetermineNPC(id)
+--end
