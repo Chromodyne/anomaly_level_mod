@@ -11,9 +11,6 @@ Creator/Developer: Chromodyne
 Contact Info/Support
       Email: chromodyne(at)protonmail.com
       Discord: Chromodyne#6925
-      Discord Server: https://discord.gg/cTWduNNS (I can also be found on the official Anomaly Discord.)
-      Patreon: 
-
 ==============
 =INSTALLATION=
 ==============
@@ -95,23 +92,3 @@ Show current exp
 
         This is the major milestone I will be moving towards.  A seperate experience pool for skills ala Tarkov. 
         i.e. Strength, Stamina, Restances, Toughness, etc. that level up when doing relevant activities and tasks.
-
-===============================
-=COPYRIGHT/LICENSE/LEGAL STUFF=
-===============================
-
-    Copyright 2021 Chromodyne - All Rights Reserved
-
-    Chromodyne, henceforth 'the creator', is the sole owner of this addon.
-    Publishing modifications or forks of this addon are forbidden without the express, written permission of the creator.
-    Use of this addon as a basis for another addon is forbidden without the express, written permision of the creator.
-    This addon may, however, be freely redistributed without modification in its original state with 
-    proper attribution given to the creator.
-
-    THE ADDON IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-    THE CREATORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-    OUT OF OR IN CONNECTION WITH THE ADDON OR THE USE OR OTHER DEALINGS IN 
-    THE ADDON.
